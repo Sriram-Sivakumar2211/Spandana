@@ -1,0 +1,14 @@
+data/raw/
+data/processed/
+*.zip
+*.7z
+*.rar
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.ckpt
+__pycache__/
+.venv/
+.env
+node_modules/
