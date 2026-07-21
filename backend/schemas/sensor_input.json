@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SensorInputWindow",
+  "description": "Standardized real-time machine window schema for Spandana predictive maintenance pipeline.",
+  "type": "object",
+  "properties": {
+    "machine_id": {
+      "type": "string",
+      "description": "Unique identifier of the industrial machine (e.g. MOTOR_001)"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 UTC timestamp of window emission"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "squirrel_cage",
+        "metropt3",
+        "thermal_motor"
+      ],
+      "description": "Source dataset identifier"
+    },
+    "window_id": {
+      "type": "string",
+      "description": "Sequential window ID (e.g. window_0001)"
+    },
+    "features": {
+      "type": "object",
+      "properties": {
+        "rms": {
+          "type": "number"
+        },
+        "kurtosis": {
+          "type": "number"
+        },
+        "skewness": {
+          "type": "number"
+        },
+        "crest_factor": {
+          "type": "number"
+        },
+        "dominant_frequency": {
+          "type": "number"
+        },
+        "temperature": {
+          "type": "number"
+        },
+        "current": {
+          "type": "number"
+        },
+        "rpm": {
+          "type": "number"
+        },
+        "tp2_pressure": {
+          "type": "number"
+        },
+        "tp3_pressure": {
+          "type": "number"
+        },
+        "hotspot_ratio": {
+          "type": "number"
+        },
+        "hotspot_intensity": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "rms",
+        "kurtosis",
+        "skewness",
+        "crest_factor",
+        "dominant_frequency",
+        "temperature",
+        "current",
+        "rpm"
+      ],
+      "additionalProperties": true
+    },
+    "label": {
+      "type": "string",
+      "enum": [
+        "healthy",
+        "warning",
+        "faulty"
+      ],
+      "description": "Unified machine operational condition label"
+    }
+  },
+  "required": [
+    "machine_id",
+    "timestamp",
+    "source",
+    "window_id",
+    "features",
+    "label"
+  ],
+  "additionalProperties": false
+}
