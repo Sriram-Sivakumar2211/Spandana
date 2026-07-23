@@ -1,100 +1,112 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "SensorInputWindow",
-  "description": "Standardized real-time machine window schema for Spandana predictive maintenance pipeline.",
+  "description": "Standardized continuous-time sensor window for the Spandana predictive maintenance platform.",
   "type": "object",
   "properties": {
     "machine_id": {
-      "type": "string",
-      "description": "Unique identifier of the industrial machine (e.g. MOTOR_001)"
+      "type": "string"
     },
+
+    "sequence_id": {
+      "type": "string",
+      "description": "Continuous operating session identifier."
+    },
+
+    "window_id": {
+      "type": "string"
+    },
+
     "timestamp": {
       "type": "string",
-      "format": "date-time",
-      "description": "ISO-8601 UTC timestamp of window emission"
+      "format": "date-time"
     },
+
+    "delta_time_ms": {
+      "type": "number",
+      "description": "Milliseconds since previous emitted window."
+    },
+
     "source": {
       "type": "string",
       "enum": [
         "squirrel_cage",
         "metropt3",
-        "thermal_motor"
-      ],
-      "description": "Source dataset identifier"
+        "thermal_motor",
+        "cwru",
+        "paderborn",
+        "nasa_ims"
+      ]
     },
-    "window_id": {
+
+    "operating_mode": {
       "type": "string",
-      "description": "Sequential window ID (e.g. window_0001)"
+      "enum": [
+        "startup",
+        "idle",
+        "normal",
+        "loaded",
+        "overload",
+        "shutdown"
+      ]
     },
+
+    "sampling_rate_hz": {
+      "type": "number"
+    },
+
+    "window_size": {
+      "type": "integer"
+    },
+
+    "overlap": {
+      "type": "integer"
+    },
+
     "features": {
       "type": "object",
       "properties": {
-        "rms": {
-          "type": "number"
-        },
-        "kurtosis": {
-          "type": "number"
-        },
-        "skewness": {
-          "type": "number"
-        },
-        "crest_factor": {
-          "type": "number"
-        },
-        "dominant_frequency": {
-          "type": "number"
-        },
-        "temperature": {
-          "type": "number"
-        },
-        "current": {
-          "type": "number"
-        },
-        "rpm": {
-          "type": "number"
-        },
-        "tp2_pressure": {
-          "type": "number"
-        },
-        "tp3_pressure": {
-          "type": "number"
-        },
-        "hotspot_ratio": {
-          "type": "number"
-        },
-        "hotspot_intensity": {
-          "type": "number"
-        }
+
+        "rms": { "type": "number" },
+        "kurtosis": { "type": "number" },
+        "skewness": { "type": "number" },
+        "crest_factor": { "type": "number" },
+        "dominant_frequency": { "type": "number" },
+
+        "temperature": { "type": "number" },
+        "current": { "type": "number" },
+        "rpm": { "type": "number" },
+
+        "tp2_pressure": { "type": "number" },
+        "tp3_pressure": { "type": "number" },
+
+        "hotspot_ratio": { "type": "number" },
+        "hotspot_intensity": { "type": "number" }
+
       },
-      "required": [
-        "rms",
-        "kurtosis",
-        "skewness",
-        "crest_factor",
-        "dominant_frequency",
-        "temperature",
-        "current",
-        "rpm"
-      ],
       "additionalProperties": true
     },
-    "label": {
+
+    "ground_truth": {
       "type": "string",
       "enum": [
         "healthy",
         "warning",
         "faulty"
-      ],
-      "description": "Unified machine operational condition label"
+      ]
     }
+
   },
+
   "required": [
     "machine_id",
-    "timestamp",
-    "source",
+    "sequence_id",
     "window_id",
-    "features",
-    "label"
+    "timestamp",
+    "delta_time_ms",
+    "source",
+    "features"
   ],
+
   "additionalProperties": false
 }

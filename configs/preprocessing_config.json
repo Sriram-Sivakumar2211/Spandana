@@ -1,0 +1,24 @@
+{
+  "_comment": "Window sizes are chosen per-dataset to cover a comparable ~0.1s of shaft rotation despite differing sample rates. Subsample caps bound total processing time on a single CPU machine; raise/remove them for a full-scale run on more compute.",
+  "nasa_ims": {
+    "window_size": 2048,
+    "step": 1024,
+    "max_files_per_test": 150
+  },
+  "cwru": {
+    "window_size": 4096,
+    "step": 2048,
+    "max_files": null
+  },
+  "paderborn": {
+    "window_size": 8192,
+    "step": 4096,
+    "max_files_per_code": 5,
+    "bearing_codes": null
+  },
+  "split": {
+    "val_size": 0.15,
+    "test_size": 0.15,
+    "seed": 42
+  }
+}

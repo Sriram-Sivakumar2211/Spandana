@@ -3,6 +3,7 @@ import datetime
 import pandas as pd
 import numpy as np
 from features.sensor_features import SensorFeatureExtractor
+from features.bearing_features import extract_bearing_feature_vector
 
 class SlidingWindowGenerator:
     """
@@ -101,6 +102,43 @@ class SlidingWindowGenerator:
             window_counter += 1
 
         return windows
+
+    def generate_vibration_windows(self, signal: np.ndarray, fs: float, source: str, bearing_class: str,
+                                    source_file: str, window_size: int = 2048, step: int = 1024,
+                                    group_id: str = None):
+        """
+        Generates sliding-window feature records from a single raw bearing
+        vibration signal (NASA IMS / CWRU / Paderborn). Every window shares
+        the fixed BEARING_FEATURE_KEYS schema from features.bearing_features
+        so windows from all three datasets are directly comparable.
+
+        `group_id` (defaults to source_file) tags every window with the
+        raw recording it came from, so downstream group-aware splitting can
+        keep overlapping windows of one recording inside a single split.
+        """
+        windows = []
+        n_samples = len(signal)
+        group_id = group_id or source_file
+
+        for start in range(0, n_samples - window_size + 1, step):
+            end = start + window_size
+            segment = signal[start:end]
+            features = extract_bearing_feature_vector(segment, fs=fs)
+
+            window_obj = {
+                "machine_id": self.machine_id,
+                "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                "source": source,
+                "window_id": f"{source}_{group_id}_{start}",
+                "group_id": group_id,
+                "source_file": source_file,
+                "features": features,
+                "label": bearing_class,
+            }
+            windows.append(window_obj)
+
+        return windows
+
 
 if __name__ == "__main__":
     df_sample = pd.DataFrame({

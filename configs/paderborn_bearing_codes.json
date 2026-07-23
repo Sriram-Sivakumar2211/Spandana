@@ -1,0 +1,38 @@
+{
+  "_comment": "Reference table derived from the Paderborn/KAt-DataCenter bearing damage documentation (Lessmeier et al. 2016, 'Condition Monitoring of Bearing Damage in Electromechanical Drive Systems by Using Motor Current Signals'). Code prefix follows German naming: K=Kein Schaden (no damage), A=Aussenring (outer race), I=Innenring (inner race), B=Beide (both).",
+  "K001": {"damage_type": "healthy", "damage_mode": "none", "location": "none"},
+  "K002": {"damage_type": "healthy", "damage_mode": "none", "location": "none"},
+  "K003": {"damage_type": "healthy", "damage_mode": "none", "location": "none"},
+  "K004": {"damage_type": "healthy", "damage_mode": "none", "location": "none"},
+  "K005": {"damage_type": "healthy", "damage_mode": "none", "location": "none"},
+  "K006": {"damage_type": "healthy", "damage_mode": "none", "location": "none"},
+
+  "KA01": {"damage_type": "outer_race", "damage_mode": "artificial", "location": "outer_race"},
+  "KA03": {"damage_type": "outer_race", "damage_mode": "artificial", "location": "outer_race"},
+  "KA05": {"damage_type": "outer_race", "damage_mode": "artificial", "location": "outer_race"},
+  "KA06": {"damage_type": "outer_race", "damage_mode": "artificial", "location": "outer_race"},
+  "KA07": {"damage_type": "outer_race", "damage_mode": "artificial", "location": "outer_race"},
+  "KA08": {"damage_type": "outer_race", "damage_mode": "artificial", "location": "outer_race"},
+  "KA09": {"damage_type": "outer_race", "damage_mode": "artificial", "location": "outer_race"},
+  "KA04": {"damage_type": "outer_race", "damage_mode": "real", "location": "outer_race"},
+  "KA15": {"damage_type": "outer_race", "damage_mode": "real", "location": "outer_race"},
+  "KA16": {"damage_type": "outer_race", "damage_mode": "real", "location": "outer_race"},
+  "KA22": {"damage_type": "outer_race", "damage_mode": "real", "location": "outer_race"},
+  "KA30": {"damage_type": "outer_race", "damage_mode": "real", "location": "outer_race"},
+
+  "KI01": {"damage_type": "inner_race", "damage_mode": "artificial", "location": "inner_race"},
+  "KI03": {"damage_type": "inner_race", "damage_mode": "artificial", "location": "inner_race"},
+  "KI05": {"damage_type": "inner_race", "damage_mode": "artificial", "location": "inner_race"},
+  "KI07": {"damage_type": "inner_race", "damage_mode": "artificial", "location": "inner_race"},
+  "KI08": {"damage_type": "inner_race", "damage_mode": "artificial", "location": "inner_race"},
+  "KI04": {"damage_type": "inner_race", "damage_mode": "real", "location": "inner_race"},
+  "KI14": {"damage_type": "inner_race", "damage_mode": "real", "location": "inner_race"},
+  "KI16": {"damage_type": "inner_race", "damage_mode": "real", "location": "inner_race"},
+  "KI17": {"damage_type": "inner_race", "damage_mode": "real", "location": "inner_race"},
+  "KI18": {"damage_type": "inner_race", "damage_mode": "real", "location": "inner_race"},
+  "KI21": {"damage_type": "inner_race", "damage_mode": "real", "location": "inner_race"},
+
+  "KB23": {"damage_type": "combined", "damage_mode": "real", "location": "inner_and_outer_race"},
+  "KB24": {"damage_type": "combined", "damage_mode": "real", "location": "inner_and_outer_race"},
+  "KB27": {"damage_type": "combined", "damage_mode": "real", "location": "inner_and_outer_race"}
+}

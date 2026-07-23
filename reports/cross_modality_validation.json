@@ -1,0 +1,96 @@
+{
+  "member1_to_bearing": {
+    "scenario": "member1_to_bearing",
+    "source_modality": [
+      "metropt3",
+      "thermal_motor",
+      "squirrel_cage"
+    ],
+    "target_modality": [
+      "nasa_ims",
+      "cwru",
+      "paderborn"
+    ],
+    "n_train_sequences": 3987,
+    "n_target_sequences": 47454,
+    "target_class_distribution": {
+      "healthy": 47551,
+      "warning": 0,
+      "faulty": 10183
+    },
+    "target_metrics": {
+      "accuracy": 0.2023643949930459,
+      "precision_macro": 0.10118219749652295,
+      "recall_macro": 0.5,
+      "f1_macro": 0.1683053788316946,
+      "roc_auc_macro": 0.09038530734875627,
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          37851
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          9603
+        ]
+      ],
+      "false_positives_total": 37851,
+      "false_negatives_total": 37851
+    },
+    "training_time_sec": 63.70353293418884
+  },
+  "bearing_to_member1": {
+    "scenario": "bearing_to_member1",
+    "source_modality": [
+      "nasa_ims",
+      "cwru",
+      "paderborn"
+    ],
+    "target_modality": [
+      "metropt3",
+      "thermal_motor",
+      "squirrel_cage"
+    ],
+    "n_train_sequences": 32987,
+    "n_target_sequences": 5703,
+    "target_class_distribution": {
+      "healthy": 720,
+      "warning": 0,
+      "faulty": 4995
+    },
+    "target_metrics": {
+      "accuracy": 0.12484657197965983,
+      "precision_macro": 0.062423285989829914,
+      "recall_macro": 0.5,
+      "f1_macro": 0.11098986749805144,
+      "roc_auc_macro": 0.510364583216081,
+      "confusion_matrix": [
+        [
+          712,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          4991,
+          0,
+          0
+        ]
+      ],
+      "false_positives_total": 4991,
+      "false_negatives_total": 4991
+    },
+    "training_time_sec": 491.7123646736145
+  }
+}

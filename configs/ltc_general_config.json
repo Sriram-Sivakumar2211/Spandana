@@ -1,0 +1,14 @@
+{
+  "seq_len": 5,
+  "stride": 1,
+  "hidden_size": 48,
+  "sparsity_level": 0.5,
+  "ode_unfolds": 6,
+  "batch_size": 256,
+  "epochs": 50,
+  "lr": 0.001,
+  "weight_decay": 1e-5,
+  "patience": 8,
+  "seed": 42,
+  "checkpoint_name": "best_ltc_general.pt"
+}

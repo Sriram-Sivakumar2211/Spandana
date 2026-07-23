@@ -1,0 +1,39 @@
+{
+  "label": "augmented",
+  "metrics": {
+    "accuracy": 0.9946795347686216,
+    "precision_macro": 0.9901511681172699,
+    "recall_macro": 0.9963816896667789,
+    "f1_macro": 0.9932108768736065,
+    "roc_auc_macro": 1.0,
+    "confusion_matrix": [
+      [
+        5899,
+        0,
+        43
+      ],
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        2140
+      ]
+    ],
+    "false_positives_total": 43,
+    "false_negatives_total": 43
+  },
+  "latency_ms": {
+    "mean_ms": 3.1599459936842322,
+    "p50_ms": 2.4321999517269433,
+    "p95_ms": 9.917054965626448,
+    "p99_ms": 11.689728992059832
+  },
+  "model_size_bytes": 200973,
+  "n_parameters": 14022,
+  "training_time_sec": 2156.4613268375397,
+  "epochs_run": 46
+}

@@ -1,0 +1,7 @@
+{
+  "real_train_healthy": 33661,
+  "real_train_faulty": 10517,
+  "n_synthetic_vectors_generated": 4629,
+  "n_synthetic_rows_added": 23145,
+  "augmented_path": "data\\unified_schema\\six_dataset_unified_augmented.npz"
+}

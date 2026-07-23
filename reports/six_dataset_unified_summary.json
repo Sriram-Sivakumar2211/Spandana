@@ -1,0 +1,43 @@
+{
+  "per_source": {
+    "metropt3": {
+      "train": 3496,
+      "val": 749,
+      "test": 750
+    },
+    "thermal_motor": {
+      "train": 279,
+      "val": 60,
+      "test": 60
+    },
+    "squirrel_cage": {
+      "train": 224,
+      "val": 48,
+      "test": 49
+    },
+    "nasa_ims": {
+      "train": 31920,
+      "val": 6840,
+      "test": 6840
+    },
+    "cwru": {
+      "train": 1414,
+      "val": 472,
+      "test": 473
+    },
+    "paderborn": {
+      "train": 6845,
+      "val": 1464,
+      "test": 1466
+    }
+  },
+  "n_train": 44178,
+  "n_val": 9633,
+  "n_test": 9638,
+  "feature_dim": 24,
+  "train_class_distribution": {
+    "healthy": 33661,
+    "warning": 0,
+    "faulty": 10517
+  }
+}

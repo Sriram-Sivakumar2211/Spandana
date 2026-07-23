@@ -1,0 +1,49 @@
+{
+  "nasa_ims": {
+    "name": "nasa_ims",
+    "n_windows": 45600,
+    "feature_dim": 17,
+    "class_counts": {
+      "healthy": 45486,
+      "inner_race": 38,
+      "outer_race": 76
+    },
+    "n_train": 31920,
+    "n_val": 6840,
+    "n_test": 6840
+  },
+  "cwru": {
+    "name": "cwru",
+    "n_windows": 2359,
+    "feature_dim": 17,
+    "class_counts": {
+      "healthy": 235,
+      "inner_race": 708,
+      "outer_race": 708,
+      "ball": 708
+    },
+    "n_train": 1414,
+    "n_val": 472,
+    "n_test": 473
+  },
+  "paderborn": {
+    "name": "paderborn",
+    "n_windows": 9775,
+    "feature_dim": 17,
+    "class_counts": {
+      "healthy": 1830,
+      "inner_race": 3361,
+      "outer_race": 3667,
+      "combined": 917
+    },
+    "n_train": 6845,
+    "n_val": 1464,
+    "n_test": 1466
+  },
+  "unified": {
+    "n_train": 40179,
+    "n_val": 8776,
+    "n_test": 8779,
+    "feature_dim": 17
+  }
+}

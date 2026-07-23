@@ -1,0 +1,174 @@
+{
+  "nasa_ims_to_paderborn": {
+    "scenario": "nasa_ims_to_paderborn",
+    "source_datasets": [
+      "nasa_ims"
+    ],
+    "target_dataset": "paderborn",
+    "n_train_sequences": 25200,
+    "n_target_sequences": 9135,
+    "target_metrics": {
+      "accuracy": 0.23984674329501915,
+      "precision_macro": 0.15433407537210134,
+      "recall_macro": 0.20430784159801185,
+      "f1_macro": 0.15894355314214637,
+      "roc_auc_macro": 0.36425133447491775,
+      "confusion_matrix": [
+        [
+          601,
+          177,
+          932,
+          0,
+          0
+        ],
+        [
+          1865,
+          68,
+          1208,
+          0,
+          0
+        ],
+        [
+          1658,
+          247,
+          1522,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          273,
+          113,
+          471,
+          0,
+          0
+        ]
+      ],
+      "false_positives_total": 6944,
+      "false_negatives_total": 6944
+    },
+    "in_domain_val_acc": 0.23984674329501915,
+    "training_time_sec": 652.2668135166168
+  },
+  "paderborn_to_cwru": {
+    "scenario": "paderborn_to_cwru",
+    "source_datasets": [
+      "paderborn"
+    ],
+    "target_dataset": "cwru",
+    "n_train_sequences": 6397,
+    "n_target_sequences": 2319,
+    "target_metrics": {
+      "accuracy": 0.2358775334195774,
+      "precision_macro": 0.056949505465903175,
+      "recall_macro": 0.157183908045977,
+      "f1_macro": 0.08360718379824225,
+      "roc_auc_macro": 0.1636611992832912,
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          231,
+          0,
+          0
+        ],
+        [
+          0,
+          547,
+          147,
+          0,
+          2
+        ],
+        [
+          0,
+          692,
+          0,
+          0,
+          4
+        ],
+        [
+          0,
+          682,
+          14,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "false_positives_total": 1772,
+      "false_negatives_total": 1772
+    },
+    "in_domain_val_acc": 0.2358775334195774,
+    "training_time_sec": 178.4145028591156
+  },
+  "nasa_ims_plus_paderborn_to_cwru": {
+    "scenario": "nasa_ims_plus_paderborn_to_cwru",
+    "source_datasets": [
+      "nasa_ims",
+      "paderborn"
+    ],
+    "target_dataset": "cwru",
+    "n_train_sequences": 31597,
+    "n_target_sequences": 2319,
+    "target_metrics": {
+      "accuracy": 0.25571366968520914,
+      "precision_macro": 0.115844177468108,
+      "recall_macro": 0.3012156665173906,
+      "f1_macro": 0.16633597883597884,
+      "roc_auc_macro": 0.654673027341577,
+      "confusion_matrix": [
+        [
+          122,
+          0,
+          109,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          696,
+          0,
+          0
+        ],
+        [
+          225,
+          0,
+          471,
+          0,
+          0
+        ],
+        [
+          398,
+          2,
+          296,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "false_positives_total": 1726,
+      "false_negatives_total": 1726
+    },
+    "in_domain_val_acc": 0.25571366968520914,
+    "training_time_sec": 842.5031373500824
+  }
+}

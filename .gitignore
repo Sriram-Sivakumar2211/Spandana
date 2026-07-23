@@ -1,5 +1,12 @@
 data/raw/
 data/processed/
+data/bearing_processed/
+data/bearing_windows/
+data/bearing_splits/
+data/unified/
+data/unified_schema/
+data/checkpoints/
+reports/tensorboard/
 *.zip
 *.7z
 *.rar

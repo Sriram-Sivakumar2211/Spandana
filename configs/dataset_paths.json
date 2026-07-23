@@ -1,0 +1,24 @@
+{
+  "nasa_ims": {
+    "raw_dir": "C:/Users/MG-Laptop/OneDrive/Data/Hackathons/LNN/Datasets/Nasa IMS dataset",
+    "sub_tests": ["1st_test", "2nd_test", "3rd_test"],
+    "sample_rate_hz": 20000,
+    "snapshot_duration_sec": 1.0
+  },
+  "paderborn": {
+    "raw_dir": "C:/Users/MG-Laptop/OneDrive/Data/Hackathons/LNN/Datasets/Paderboen bearing dataset",
+    "sample_rate_hz": 64000
+  },
+  "cwru": {
+    "raw_dir": "C:/Users/MG-Laptop/OneDrive/Data/Hackathons/LNN/Datasets/CWRU bearing dataset/raw",
+    "sample_rate_hz": 48000
+  },
+  "output": {
+    "processed_dir": "data/bearing_processed",
+    "windows_dir": "data/bearing_windows",
+    "splits_dir": "data/bearing_splits",
+    "unified_dir": "data/unified",
+    "checkpoints_dir": "data/checkpoints",
+    "reports_dir": "reports"
+  }
+}

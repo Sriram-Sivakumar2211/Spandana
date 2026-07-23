@@ -1,0 +1,233 @@
+{
+  "nasa_ims": {
+    "dataset": "NASA IMS Bearing Dataset",
+    "raw_dir": "C:/Users/MG-Laptop/OneDrive/Data/Hackathons/LNN/Datasets/Nasa IMS dataset",
+    "tests": {
+      "1st_test": {
+        "snapshot_dir": "C:/Users/MG-Laptop/OneDrive/Data/Hackathons/LNN/Datasets/Nasa IMS dataset\\1st_test\\1st_test",
+        "n_snapshots": 2156,
+        "n_channels": 8,
+        "expected_channels": 8,
+        "samples_per_snapshot": 20480,
+        "sample_rate_hz": 20000.0,
+        "snapshot_duration_sec": 1.024,
+        "first_snapshot": "2003.10.22.12.06.24",
+        "last_snapshot": "2003.11.25.23.39.56",
+        "missing_values_in_sample_file": 0,
+        "documented_failing_channels": {
+          "bearing3_ch1": "inner_race",
+          "bearing3_ch2": "inner_race",
+          "bearing4_ch1": "ball",
+          "bearing4_ch2": "ball"
+        },
+        "labels": "No ground-truth per-file labels; run-to-failure only. Health state is derived via RMS-trend heuristic (see nasa_ims_preprocess.py)."
+      },
+      "2nd_test": {
+        "snapshot_dir": "C:/Users/MG-Laptop/OneDrive/Data/Hackathons/LNN/Datasets/Nasa IMS dataset\\2nd_test\\2nd_test",
+        "n_snapshots": 984,
+        "n_channels": 4,
+        "expected_channels": 4,
+        "samples_per_snapshot": 20480,
+        "sample_rate_hz": 20000.0,
+        "snapshot_duration_sec": 1.024,
+        "first_snapshot": "2004.02.12.10.32.39",
+        "last_snapshot": "2004.02.19.06.22.39",
+        "missing_values_in_sample_file": 0,
+        "documented_failing_channels": {
+          "bearing1": "outer_race"
+        },
+        "labels": "No ground-truth per-file labels; run-to-failure only. Health state is derived via RMS-trend heuristic (see nasa_ims_preprocess.py)."
+      },
+      "3rd_test": {
+        "snapshot_dir": "C:/Users/MG-Laptop/OneDrive/Data/Hackathons/LNN/Datasets/Nasa IMS dataset\\3rd_test\\4th_test\\txt",
+        "n_snapshots": 6324,
+        "n_channels": 4,
+        "expected_channels": 4,
+        "samples_per_snapshot": 20480,
+        "sample_rate_hz": 20000.0,
+        "snapshot_duration_sec": 1.024,
+        "first_snapshot": "2004.03.04.09.27.46",
+        "last_snapshot": "2004.04.18.02.42.55",
+        "missing_values_in_sample_file": 0,
+        "documented_failing_channels": {
+          "bearing3": "outer_race"
+        },
+        "labels": "No ground-truth per-file labels; run-to-failure only. Health state is derived via RMS-trend heuristic (see nasa_ims_preprocess.py)."
+      }
+    }
+  },
+  "cwru": {
+    "dataset": "CWRU Bearing Dataset",
+    "raw_dir": "C:/Users/MG-Laptop/OneDrive/Data/Hackathons/LNN/Datasets/CWRU bearing dataset/raw",
+    "n_files": 10,
+    "sample_rate_hz": 48000.0,
+    "fault_class_distribution": {
+      "ball": 3,
+      "inner_race": 3,
+      "outer_race": 3,
+      "healthy": 1
+    },
+    "missing_values_total": 0,
+    "files": [
+      {
+        "file": "B007_1_123.mat",
+        "fault_code": "B",
+        "defect_size_mils": 7,
+        "motor_load_hp": 1,
+        "bearing_class": "ball",
+        "available_channel_keys": [
+          "X123_DE_time",
+          "X123_FE_time",
+          "X123RPM"
+        ],
+        "n_samples": 487384
+      },
+      {
+        "file": "B014_1_190.mat",
+        "fault_code": "B",
+        "defect_size_mils": 14,
+        "motor_load_hp": 1,
+        "bearing_class": "ball",
+        "available_channel_keys": [
+          "X190_DE_time",
+          "X190_FE_time",
+          "X190RPM"
+        ],
+        "n_samples": 486224
+      },
+      {
+        "file": "B021_1_227.mat",
+        "fault_code": "B",
+        "defect_size_mils": 21,
+        "motor_load_hp": 1,
+        "bearing_class": "ball",
+        "available_channel_keys": [
+          "X227_DE_time",
+          "X227_FE_time",
+          "X227RPM"
+        ],
+        "n_samples": 486804
+      },
+      {
+        "file": "IR007_1_110.mat",
+        "fault_code": "IR",
+        "defect_size_mils": 7,
+        "motor_load_hp": 1,
+        "bearing_class": "inner_race",
+        "available_channel_keys": [
+          "X110_DE_time",
+          "X110_FE_time",
+          "X110RPM"
+        ],
+        "n_samples": 486224
+      },
+      {
+        "file": "IR014_1_175.mat",
+        "fault_code": "IR",
+        "defect_size_mils": 14,
+        "motor_load_hp": 1,
+        "bearing_class": "inner_race",
+        "available_channel_keys": [
+          "X217",
+          "X217_DE_time",
+          "X175_DE_time",
+          "X175_FE_time",
+          "X175RPM"
+        ],
+        "n_samples": 489125
+      },
+      {
+        "file": "IR021_1_214.mat",
+        "fault_code": "IR",
+        "defect_size_mils": 21,
+        "motor_load_hp": 1,
+        "bearing_class": "inner_race",
+        "available_channel_keys": [
+          "X214_DE_time",
+          "X214_FE_time",
+          "X214RPM"
+        ],
+        "n_samples": 485063
+      },
+      {
+        "file": "OR007_6_1_136.mat",
+        "fault_code": "OR",
+        "defect_size_mils": 7,
+        "motor_load_hp": 1,
+        "bearing_class": "outer_race",
+        "available_channel_keys": [
+          "X136_DE_time",
+          "X136_FE_time",
+          "X136RPM"
+        ],
+        "n_samples": 486804
+      },
+      {
+        "file": "OR014_6_1_202.mat",
+        "fault_code": "OR",
+        "defect_size_mils": 14,
+        "motor_load_hp": 1,
+        "bearing_class": "outer_race",
+        "available_channel_keys": [
+          "X202_DE_time",
+          "X202_FE_time",
+          "X202RPM"
+        ],
+        "n_samples": 484483
+      },
+      {
+        "file": "OR021_6_1_239.mat",
+        "fault_code": "OR",
+        "defect_size_mils": 21,
+        "motor_load_hp": 1,
+        "bearing_class": "outer_race",
+        "available_channel_keys": [
+          "X239_DE_time",
+          "X239_FE_time",
+          "X239RPM"
+        ],
+        "n_samples": 489125
+      },
+      {
+        "file": "Time_Normal_1_098.mat",
+        "fault_code": "TIME_NORMAL",
+        "defect_size_mils": 0,
+        "motor_load_hp": 1,
+        "bearing_class": "healthy",
+        "available_channel_keys": [
+          "X098_DE_time",
+          "X098_FE_time"
+        ],
+        "n_samples": 483903
+      }
+    ]
+  },
+  "paderborn": {
+    "dataset": "Paderborn Bearing Dataset",
+    "raw_dir": "C:/Users/MG-Laptop/OneDrive/Data/Hackathons/LNN/Datasets/Paderboen bearing dataset",
+    "n_bearing_codes": 32,
+    "n_files_total": 2560,
+    "sample_rate_hz": 64000.0,
+    "sample_channel_names": [
+      "force",
+      "phase_current_1",
+      "phase_current_2",
+      "speed",
+      "temp_2_bearing_module",
+      "torque",
+      "vibration_1"
+    ],
+    "fault_class_distribution": {
+      "healthy": 480,
+      "outer_race": 960,
+      "combined": 240,
+      "inner_race": 880
+    },
+    "damage_mode_distribution": {
+      "none": 480,
+      "artificial": 960,
+      "real": 1120
+    },
+    "missing_values_in_sample_file": 0
+  }
+}

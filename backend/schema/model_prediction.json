@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ModelPrediction",
+  "description": "Standardized prediction output emitted by the Spandana LTC inference engine (inference/predict.py::LTCInferenceEngine) for the backend/dashboard to consume.",
+  "type": "object",
+  "properties": {
+
+    "machine_id": { "type": "string" },
+
+    "window_id": { "type": "string" },
+
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "health_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "0 = fully faulty, 100 = fully healthy. Derived as (1 - fault_probability) * 100."
+    },
+
+    "anomaly_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Unsupervised out-of-distribution signal. Falls back to fault_probability when no trained reconstruction-error scorer (see augmentation/vae.py) is attached."
+    },
+
+    "fault_probability": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+
+    "predicted_fault": {
+      "type": "string",
+      "description": "Human-readable predicted condition, e.g. 'Healthy', 'Inner Race Fault', 'Outer Race Fault', 'Ball/Roller Fault', 'Combined Inner+Outer Fault'."
+    },
+
+    "prediction_confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Softmax probability of the predicted class."
+    },
+
+    "remaining_useful_life_hours": {
+      "type": ["number", "null"],
+      "description": "Linear-trend extrapolation of health_score to zero, in hours. Present only when the machine has enough prediction history (>=5 points) AND a clearly declining trend; null otherwise -- never fabricated from insufficient data."
+    },
+
+    "recommended_action": {
+      "type": "string",
+      "description": "Rule-based maintenance recommendation (inference/decision_rules.py) -- deliberately not model-generated, for auditability."
+    }
+
+  },
+
+  "required": [
+    "machine_id",
+    "window_id",
+    "timestamp",
+    "health_score",
+    "anomaly_score",
+    "fault_probability",
+    "predicted_fault",
+    "prediction_confidence",
+    "recommended_action"
+  ],
+
+  "additionalProperties": false
+}
