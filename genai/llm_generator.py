@@ -60,7 +60,12 @@ class LLMReportGenerator:
             retrieved_context=context_str,
         )
 
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        # "gemini-1.5-flash" was retired by Google (confirmed via a live
+        # ListModels call against this project's API key -- it now 404s).
+        # "gemini-flash-latest" is Google's maintained alias for the current
+        # flash-tier model, chosen so this doesn't go stale again the next
+        # time a specific dated model is deprecated.
+        model = genai.GenerativeModel("gemini-flash-latest")
         response = model.generate_content(
             prompt,
             generation_config={"temperature": 0.2, "response_mime_type": "application/json"}
