@@ -1,7 +1,6 @@
 import numpy as np
 from scipy import stats
 
-def
 try:
     import pywt
     _HAS_PYWT = True

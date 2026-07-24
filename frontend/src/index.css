@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  SPANDANA theme tokens. Light is the default :root; adding the `.dark` class
+  on <html> (ThemeContext) switches every token. All components read these
+  through Tailwind color aliases (bg-card, text-foreground, ...), so a single
+  toggle re-themes the whole app.
+*/
+:root {
+  --bg: #f8f9fa;
+  --sidebar: #ffffff;
+  --card: #ffffff;
+  --border: #e5e7eb;
+  --primary: #f97316;
+  --primary-hover: #fb923c;
+  --primary-foreground: #ffffff;
+  --text: #111827;
+  --text-muted: #6b7280;
+  --success: #22c55e;
+  --warning: #facc15;
+  --critical: #ef4444;
+  --ring: #f97316;
+
+  --grid-line: rgba(17, 24, 39, 0.06);
+  --elevate: rgba(17, 24, 39, 0.04);
+}
+
+.dark {
+  --bg: #111111;
+  --sidebar: #181818;
+  --card: #202020;
+  --border: #2d2d2d;
+  --primary: #f97316;
+  --primary-hover: #fb923c;
+  --primary-foreground: #ffffff;
+  --text: #f5f5f5;
+  --text-muted: #a3a3a3;
+  --success: #22c55e;
+  --warning: #facc15;
+  --critical: #ef4444;
+  --ring: #f97316;
+
+  --grid-line: rgba(255, 255, 255, 0.06);
+  --elevate: rgba(0, 0, 0, 0.25);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  /* "Anthropic serif" editorial feel across the whole app. */
+  font-family: "Newsreader", Georgia, Cambria, serif;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: "DM Serif Display", "Newsreader", Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* tabular numbers wherever data lines up */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+::selection {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* Custom scrollbar to match the premium SaaS feel */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+  border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

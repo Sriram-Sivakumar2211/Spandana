@@ -1,0 +1,24 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+numpy
+pandas
+scipy
+scikit-learn
+PyWavelets
+matplotlib
+seaborn
+tensorboard
+tqdm
+joblib
+pyarrow
+torch
+ncps
+Pillow
+jsonschema
+fastapi
+uvicorn[standard]
+
+# Optional: enables the real Gemini-backed maintenance report generator in
+# genai/llm_generator.py. Without it (or without GEMINI_API_KEY set), the
+# backend automatically falls back to the deterministic grounded rule engine.
+google-generativeai
