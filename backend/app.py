@@ -7,8 +7,7 @@ from typing import Dict, Any, List, Optional
 
 from fastapi import FastAPI, HTTPException, Query, Body, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 
 sys.path.insert(0, os.path.abspath("."))
 
@@ -423,6 +422,24 @@ def dashboard_summary_endpoint():
 # (package.json, src/*.tsx, ...), not deployable static assets. In local
 # development the Vite dev server (npm run dev, port 5173) is used instead,
 # proxying API calls to this backend -- see frontend/vite.config.ts.
+#
+# Registered LAST (after every API route above) and matches any path, but
+# Starlette tries routes in registration order, so none of the API routes
+# above are shadowed -- this only ever runs for requests nothing else matched.
+#
+# A plain StaticFiles(html=True) mount here would 404 on a direct link or
+# hard refresh to any client-side route (e.g. /predictions, /machines/X --
+# React Router paths with no matching file in dist/), since it only serves
+# index.html for the literal root path. This serves a real built file when
+# one exists at the requested path (JS/CSS bundles, favicon, ...) and falls
+# back to index.html otherwise, so React Router can take over client-side --
+# confirmed broken without this (GET /predictions -> 404) before this fix.
 frontend_dist_dir = os.path.abspath(os.path.join("frontend", "dist"))
 if os.path.exists(frontend_dist_dir):
-    app.mount("/", StaticFiles(directory=frontend_dist_dir, html=True), name="static")
+    @app.get("/{full_path:path}")
+    def serve_spa(full_path: str):
+        candidate = os.path.abspath(os.path.join(frontend_dist_dir, full_path))
+        is_within_dist = candidate.startswith(frontend_dist_dir + os.sep)
+        if full_path and is_within_dist and os.path.isfile(candidate):
+            return FileResponse(candidate)
+        return FileResponse(os.path.join(frontend_dist_dir, "index.html"))
