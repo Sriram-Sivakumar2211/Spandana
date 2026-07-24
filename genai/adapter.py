@@ -78,6 +78,17 @@ class PredictionAdapter:
             query_terms.extend(["severe bearing failure", "spalling", "replacement"])
         elif "healthy" in fault.lower():
             query_terms.extend(["normal operation", "routine lubrication", "inspection checklist"])
+        elif fault.lower() == "warning":
+            # The general 6-dataset severity model (Track 1 sources: MetroPT-3,
+            # squirrel-cage, thermal motor) only outputs a coarse severity
+            # label, not a specific fault location -- unlike the bearing
+            # specialist above. Retrieving broadly across the motor_faults/
+            # knowledge-base category is honest here; naming one specific
+            # fault (e.g. "misalignment") would fabricate precision the model
+            # itself doesn't have.
+            query_terms.extend(["early degradation", "condition monitoring", "preventive maintenance", "rising temperature", "vibration increase"])
+        elif fault.lower() == "faulty":
+            query_terms.extend(["motor fault", "abnormal vibration", "overheating", "electrical anomaly", "rotor imbalance", "misalignment"])
 
         if health < 50.0 or anomaly > 0.5:
             query_terms.extend(["critical severity", "emergency action", "vibration RMS", "overheating"])
