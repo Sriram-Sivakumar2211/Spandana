@@ -6,28 +6,28 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { PredictionCard } from "@/components/features/PredictionCard";
-import { SensorChart } from "@/components/features/SensorChart";
+import { ReportCard } from "@/components/features/ReportCard";
+import { KnowledgeSourcesCard } from "@/components/features/KnowledgeSourcesCard";
 import { EmptyState } from "@/components/ui/States";
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
 import { useMachines } from "@/hooks/useMachines";
-import { useStream } from "@/hooks/useStream";
-import { fetchPrediction } from "@/services/spandanaService";
+import { assessMachine } from "@/services/spandanaService";
 import { formatMaybe, formatSource } from "@/utils/format";
-import type { Prediction } from "@/types";
+import type { DashboardMachineStatus } from "@/types";
 
 export default function MachineDetail() {
   const { id } = useParams<{ id: string }>();
   const { machines, loading } = useMachines();
-  const { series } = useStream({ window: 30 });
-  const [prediction, setPrediction] = useState<Prediction | null>(null);
+  const [assessment, setAssessment] = useState<DashboardMachineStatus | null>(null);
   const machine = machines.find((m) => m.id === id);
+  const prediction = assessment?.prediction ?? null;
 
   useEffect(() => {
     if (!id) return;
     let active = true;
     (async () => {
-      const { data } = await fetchPrediction(id);
-      if (active) setPrediction(data);
+      const { data } = await assessMachine(id);
+      if (active) setAssessment(data);
     })();
     return () => {
       active = false;
@@ -101,29 +101,39 @@ export default function MachineDetail() {
         })}
       </div>
 
-      {prediction && (
+      {prediction ? (
         <div className="mb-5">
           <PredictionCard prediction={prediction} />
         </div>
+      ) : (
+        <CardSkeleton />
       )}
 
-      <h2 className="mb-3 font-display text-xl text-foreground">
-        Live Telemetry
-      </h2>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <SensorChart
-          title="Vibration"
-          unit="mm/s"
-          data={series}
-          dataKey="vibration"
-          color="var(--primary)"
-        />
-        <SensorChart
-          title="Temperature"
-          unit="°C"
-          data={series}
-          dataKey="temperature"
-          color="var(--critical)"
+      {/* Real RAG-grounded maintenance intelligence for this machine */}
+      <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
+        <div>
+          {assessment?.report && (
+            <ReportCard
+              report={assessment.report}
+              machine={machine}
+              onDownload={() => {
+                const blob = new Blob(
+                  [JSON.stringify(assessment.report, null, 2)],
+                  { type: "application/json" },
+                );
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `spandana-report-${machine.id}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+            />
+          )}
+        </div>
+        <KnowledgeSourcesCard
+          query={assessment?.retrieval?.query ?? ""}
+          chunks={assessment?.retrieval?.chunks ?? []}
         />
       </div>
     </PageTransition>

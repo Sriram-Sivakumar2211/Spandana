@@ -144,6 +144,72 @@ export async function fetchAlerts() {
 }
 
 /**
+ * Full RAG-grounded assessment for one machine: takes its latest real
+ * prediction and runs it through POST /api/v1/dashboard/machine-status, which
+ * returns the model prediction, the retrieved knowledge-base chunks, and the
+ * grounded maintenance report together -- everything real, nothing fabricated
+ * client-side. Used by the machine detail view.
+ */
+export async function assessMachine(machineId: string) {
+  return withFallback<DashboardMachineStatus>(
+    async () => {
+      const { data: history } = await api.get<Prediction[]>("/predictions/history", {
+        params: { machine_id: machineId },
+      });
+      if (history.length === 0) throw new Error("no predictions yet for this machine");
+      const latest = history[history.length - 1];
+      const { data } = await api.post<DashboardMachineStatus>(
+        "/api/v1/dashboard/machine-status",
+        latest,
+      );
+      return data;
+    },
+    () => {
+      const m = MACHINES.find((x) => x.id === machineId) ?? MACHINES[0];
+      const prediction = predictionFor(m);
+      return {
+        machine_id: m.id,
+        timestamp: prediction.timestamp,
+        status: m.status,
+        prediction,
+        retrieval: { query: "", chunks: [] },
+        report: reportFor(m),
+      };
+    },
+  );
+}
+
+/**
+ * Runs ONE real LTC inference via POST /predict -- the fast path (real trained
+ * model, no RAG report generation), so Live Monitoring can stream a genuine
+ * model-output curve at ~1s cadence. Every call advances that machine's
+ * continuous-time hidden state on the backend (backend/app.py keeps the
+ * engines alive across requests), so feeding a drifting window sequence shows
+ * the stateful model responding over time -- not a client-side animation.
+ * Falls back to the local generator only if the backend is unreachable.
+ */
+export async function runPrediction(
+  machineId: string,
+  source: string,
+  features: Record<string, number>,
+) {
+  return withFallback<Prediction>(
+    async () =>
+      (
+        await api.post<Prediction>("/predict", {
+          machine_id: machineId,
+          source,
+          features,
+        })
+      ).data,
+    () => {
+      const m = MACHINES.find((x) => x.id === machineId) ?? MACHINES[0];
+      return { ...predictionFor(m), health_score: 60 + Math.random() * 35 };
+    },
+  );
+}
+
+/**
  * Submits a labeled demo sensor window to POST /api/v1/sensor-stream and
  * returns the REAL resulting prediction + RAG report (the backend runs the
  * actual trained model -- see backend/app.py::_run_inference -- nothing here

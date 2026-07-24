@@ -13,6 +13,7 @@ interface NavbarProps {
   connected: boolean;
   search: string;
   onSearch: (v: string) => void;
+  showNotifications: boolean;
 }
 
 export function Navbar({
@@ -21,6 +22,7 @@ export function Navbar({
   connected,
   search,
   onSearch,
+  showNotifications,
 }: NavbarProps) {
   const now = useClock();
   return (
@@ -71,7 +73,7 @@ export function Navbar({
         </div>
 
         <ThemeToggle />
-        <NotificationBell alerts={alerts} />
+        {showNotifications && <NotificationBell alerts={alerts} />}
         <ProfileMenu />
       </div>
     </header>

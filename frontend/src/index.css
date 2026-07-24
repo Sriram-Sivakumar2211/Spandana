@@ -54,13 +54,27 @@ html {
   scroll-behavior: smooth;
 }
 
+/*
+  ONE serif family everywhere (Source Serif 4). Variation comes only from
+  weight / size / style per location, never from a second typeface:
+    - body copy      : 400
+    - labels / meta   : 500-600, slightly tightened
+    - headings        : 600 display optical size, tightened tracking
+    - big display     : 600-700
+  Data/numbers stay in the SAME family, just with tabular figures so columns
+  still align -- Source Serif 4 ships real tabular numerals.
+*/
+:root {
+  --font-serif: "Source Serif 4", Georgia, Cambria, "Times New Roman", serif;
+}
+
 body {
   margin: 0;
   background-color: var(--bg);
   color: var(--text);
-  /* "Anthropic serif" editorial feel across the whole app. */
-  font-family: "Newsreader", Georgia, Cambria, serif;
+  font-family: var(--font-serif);
   font-optical-sizing: auto;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -70,15 +84,17 @@ h2,
 h3,
 h4,
 .font-display {
-  font-family: "DM Serif Display", "Newsreader", Georgia, serif;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  font-optical-sizing: auto;
 }
 
-/* tabular numbers wherever data lines up */
+/* tabular numbers wherever data lines up -- same serif, aligned figures */
 .tnum {
+  font-family: var(--font-serif);
   font-variant-numeric: tabular-nums;
-  font-family: "Inter", system-ui, sans-serif;
+  font-feature-settings: "tnum" 1;
 }
 
 ::selection {

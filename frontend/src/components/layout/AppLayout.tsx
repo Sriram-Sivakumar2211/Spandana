@@ -6,6 +6,7 @@ import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { fetchAlerts } from "@/services/spandanaService";
+import { useSettings } from "@/context/SettingsContext";
 import type { AlertItem } from "@/types";
 
 export function AppLayout({ children }: { children: ReactNode }) {
@@ -15,8 +16,15 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [connected, setConnected] = useState(false);
   const [search, setSearch] = useState("");
   const location = useLocation();
+  const { notificationsEnabled } = useSettings();
 
   useEffect(() => {
+    // Notifications toggle genuinely controls this: when off, we stop polling
+    // the real /alerts endpoint entirely and clear the badge.
+    if (!notificationsEnabled) {
+      setAlerts([]);
+      return;
+    }
     let active = true;
     const load = async () => {
       const { data, live } = await fetchAlerts();
@@ -30,7 +38,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
       active = false;
       window.clearInterval(id);
     };
-  }, []);
+  }, [notificationsEnabled]);
 
   return (
     <div className="flex h-screen overflow-hidden bg-background text-foreground">
@@ -78,6 +86,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           connected={connected}
           search={search}
           onSearch={setSearch}
+          showNotifications={notificationsEnabled}
         />
         <main className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">

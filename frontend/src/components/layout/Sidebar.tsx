@@ -1,8 +1,9 @@
 import { NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronLeft, Gauge } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { NAV_ITEMS } from "./navConfig";
+import { Logo, LogoMark } from "./Logo";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -24,19 +25,11 @@ export function Sidebar({
       )}
     >
       {/* Brand */}
-      <div className="flex h-16 items-center gap-3 px-4">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-soft">
-          <Gauge size={20} />
-        </div>
-        {!collapsed && (
-          <div className="min-w-0">
-            <p className="truncate font-display text-lg leading-none text-foreground">
-              SPANDANA
-            </p>
-            <p className="mt-1 truncate text-[11px] leading-none text-muted">
-              AI Predictive Maintenance
-            </p>
-          </div>
+      <div className="flex h-16 items-center px-4">
+        {collapsed ? (
+          <LogoMark size={30} className="mx-auto text-foreground" />
+        ) : (
+          <Logo markSize={32} />
         )}
       </div>
 

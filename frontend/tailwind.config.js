@@ -27,9 +27,11 @@ export default {
         // "Anthropic serif" editorial feel applied across the app: a refined
         // screen serif (Newsreader) is the default body face, DM Serif Display
         // carries large display headings, Inter is the numeric/utility fallback.
-        serif: ["Newsreader", "Georgia", "Cambria", "serif"],
-        display: ['"DM Serif Display"', "Newsreader", "Georgia", "serif"],
-        sans: ["Inter", "system-ui", "sans-serif"],
+        // One serif family everywhere -- every alias resolves to the same
+        // font so no component can accidentally introduce a second typeface.
+        serif: ['"Source Serif 4"', "Georgia", "Cambria", "serif"],
+        display: ['"Source Serif 4"', "Georgia", "Cambria", "serif"],
+        sans: ['"Source Serif 4"', "Georgia", "Cambria", "serif"],
       },
       borderRadius: {
         xl: "0.9rem",

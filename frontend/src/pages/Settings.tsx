@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Check, Globe, Info, Server, SlidersHorizontal } from "lucide-react";
+import { Bell, Check, Gauge, Info, Server, SlidersHorizontal } from "lucide-react";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/hooks/useTheme";
+import { useSettings } from "@/context/SettingsContext";
 import { getApiBase, setApiBase } from "@/services/api";
 import { cn } from "@/utils/cn";
 
@@ -37,10 +38,13 @@ function Section({
 
 export default function Settings() {
   const { theme, setTheme } = useTheme();
+  const {
+    replaySpeed,
+    setReplaySpeed,
+    notificationsEnabled,
+    setNotificationsEnabled,
+  } = useSettings();
   const [apiBase, setApiBaseInput] = useState(getApiBase());
-  const [replaySpeed, setReplaySpeed] = useState(1);
-  const [notifications, setNotifications] = useState(true);
-  const [language, setLanguage] = useState("en");
   const [saved, setSaved] = useState(false);
 
   const save = () => {
@@ -100,9 +104,9 @@ export default function Settings() {
         </Section>
 
         <Section
-          icon={SlidersHorizontal}
+          icon={Gauge}
           title="Replay Speed"
-          desc="Stream simulation speed multiplier for Live Monitoring."
+          desc="Controls how fast Live Monitoring streams windows through the model."
         >
           <div className="flex items-center gap-4">
             <input
@@ -119,48 +123,45 @@ export default function Settings() {
               {replaySpeed.toFixed(1)}×
             </span>
           </div>
+          <p className="mt-2 text-xs text-muted">
+            At {replaySpeed.toFixed(1)}×, Live Monitoring runs one inference
+            every {(1000 / replaySpeed / 1000).toFixed(2)}s. Applied instantly
+            &mdash; open Live Monitoring to see it change.
+          </p>
         </Section>
 
         <Section
-          icon={Globe}
-          title="Preferences"
-          desc="Notifications and language."
+          icon={Bell}
+          title="Notifications"
+          desc="When on, the app polls the backend /alerts endpoint and shows the bell badge."
         >
-          <div className="space-y-4">
-            <label className="flex items-center justify-between">
-              <span className="text-sm text-foreground">Enable notifications</span>
-              <button
-                onClick={() => setNotifications((n) => !n)}
-                role="switch"
-                aria-checked={notifications}
-                aria-label="Toggle notifications"
+          <label className="flex items-center justify-between">
+            <span className="text-sm text-foreground">
+              Enable alert notifications
+            </span>
+            <button
+              onClick={() => setNotificationsEnabled(!notificationsEnabled)}
+              role="switch"
+              aria-checked={notificationsEnabled}
+              aria-label="Toggle notifications"
+              className={cn(
+                "relative h-6 w-11 rounded-full transition-colors",
+                notificationsEnabled ? "bg-primary" : "bg-foreground/20",
+              )}
+            >
+              <span
                 className={cn(
-                  "relative h-6 w-11 rounded-full transition-colors",
-                  notifications ? "bg-primary" : "bg-foreground/20",
+                  "absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform",
+                  notificationsEnabled ? "translate-x-5" : "translate-x-0.5",
                 )}
-              >
-                <span
-                  className={cn(
-                    "absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform",
-                    notifications ? "translate-x-5" : "translate-x-0.5",
-                  )}
-                />
-              </button>
-            </label>
-            <div>
-              <label className="mb-1.5 block text-xs text-muted">Language</label>
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none"
-              >
-                <option value="en">English</option>
-                <option value="hi">हिन्दी (Hindi)</option>
-                <option value="ta">தமிழ் (Tamil)</option>
-                <option value="de">Deutsch</option>
-              </select>
-            </div>
-          </div>
+              />
+            </button>
+          </label>
+          <p className="mt-2 text-xs text-muted">
+            {notificationsEnabled
+              ? "On — the navbar bell is live and refreshes fleet alerts every 15s."
+              : "Off — alert polling is stopped and the bell is hidden. Saved to your browser."}
+          </p>
         </Section>
       </div>
 
