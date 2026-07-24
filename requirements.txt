@@ -17,6 +17,7 @@ Pillow
 jsonschema
 fastapi
 uvicorn[standard]
+python-dotenv
 
 # Optional: enables the real Gemini-backed maintenance report generator in
 # genai/llm_generator.py. Without it (or without GEMINI_API_KEY set), the

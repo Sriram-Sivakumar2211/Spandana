@@ -4,6 +4,92 @@ This repository unifies two datasets tracks -- Member 1's electro-mechanical sen
 
 Spandana's model is **LTC-only**. There is no LSTM anywhere in this codebase or its history going forward -- the model is the official MIT implementation via [`ncps`](https://github.com/mlech26l/ncps) (`ncps.torch.LTC`, wired with `AutoNCP`), not a custom from-scratch ODE layer.
 
+## Getting Started (Backend + Frontend)
+
+This section is the fastest path to a running app -- backend API + React dashboard. The trained model checkpoints are already included, so you do not need to run any training scripts to see the app work.
+
+### Prerequisites
+
+- **Python 3.10+**
+- **Node.js 18+** (20+ recommended) and npm
+- **Git**
+
+### Installation
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/Sriram-Sivakumar2211/Spandana.git
+cd Spandana
+
+# 2. Install backend (Python) dependencies
+python -m venv .venv
+# Windows:
+.venv\Scripts\activate
+# macOS/Linux:
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# 3. Install frontend dependencies
+cd frontend
+npm install
+cd ..
+```
+
+> **Windows note**: if you're inside a deeply-nested or cloud-synced folder (OneDrive, Dropbox), create the virtualenv somewhere shorter instead (e.g. `C:\dev\spandana-venv`) -- see the path-length caveat under [ML Pipeline Setup](#ml-pipeline-setup) below.
+
+### Environment Variables
+
+The backend's RAG report generator can optionally call the real Gemini LLM API. **This is optional** -- without it, the backend automatically falls back to a deterministic, still-grounded rule-based report generator, and the app works identically either way except the report text is templated instead of LLM-written.
+
+1. Copy the example file:
+   ```bash
+   # macOS/Linux/Git Bash:
+   cp .env.example .env
+   # Windows (Command Prompt):
+   copy .env.example .env
+   ```
+2. Get a **free** Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey) (sign in with any Google account, click "Create API key").
+3. Open `.env` and paste your key:
+   ```
+   GEMINI_API_KEY=YOUR_API_KEY
+   ```
+4. Save the file. **Do not commit it** -- `.env` is gitignored; only `.env.example` (with a placeholder, no real key) is tracked in git.
+
+The backend reads this automatically via [`python-dotenv`](https://pypi.org/project/python-dotenv/) at startup (`backend/app.py`) -- no extra flags or steps needed. If `GEMINI_API_KEY` isn't set at all, the backend still starts and runs normally; check `GET /health` to see which report engine is currently active (`"Google Gemini API"` vs `"Grounded Rule Engine (Offline Fallback)"`).
+
+### Running the Project
+
+**Backend** (from the repo root, with your virtualenv activated):
+
+```bash
+uvicorn backend.app:app --reload
+```
+
+**Frontend** (in a second terminal):
+
+```bash
+cd frontend
+npm run dev
+```
+
+**Expected URLs**:
+
+| Service | URL |
+|---|---|
+| Frontend (React dashboard) | http://localhost:5173 |
+| Backend API | http://localhost:8000 |
+| Backend health check | http://localhost:8000/health |
+| Backend interactive API docs | http://localhost:8000/docs |
+
+The frontend's dev server proxies API calls to the backend automatically (`frontend/vite.config.ts`) -- open http://localhost:5173 and the dashboard should load and start showing live data.
+
+### Security
+
+- API keys are **intentionally excluded from this repository** -- `.env` is gitignored, and the full git history was checked to confirm no key has ever been committed.
+- Every user/judge should create and use **their own** Gemini API key (free from Google AI Studio) rather than sharing one.
+- Store keys **only** in your local `.env` file or your OS's environment variables -- never in source code, never in a commit, never in a screenshot you share.
+- If you ever paste a key somewhere it shouldn't be, the safe fix is to regenerate/revoke it in Google AI Studio and swap in a new one -- keys are free and instant to reissue.
+
 ## Two models, one schema
 
 | | Bearing specialist | General severity model |
@@ -81,7 +167,9 @@ data/bearing_processed, data/bearing_windows, data/bearing_splits, data/unified,
 reports/              EDA report, per-dataset notes, evaluation reports, cross-dataset report, cross-modality report, preprocessing validation report
 ```
 
-## Setup
+## ML Pipeline Setup
+
+The steps below are for re-running the ML training/evaluation pipeline itself (preprocessing, training, cross-dataset validation, etc.) -- not required just to run the app; see [Getting Started](#getting-started-backend--frontend) above for that.
 
 Python 3.10+ recommended (PyTorch CPU wheels). **On Windows, create the virtualenv outside deeply-nested/OneDrive-synced paths** — PyTorch ships license files with very long relative paths that can exceed Windows' 260-char path limit if the venv itself is nested too deeply (this bit us during development; the fix was simply relocating the venv, e.g. to `C:\Users\<you>\spandana_ml_env`).
 

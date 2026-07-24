@@ -5,6 +5,15 @@ import numpy as np
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 
+from dotenv import load_dotenv
+# Loads GEMINI_API_KEY (and any other var) from a local .env file into the
+# process environment if one is present -- purely additive config loading,
+# does not change any route, model, or Gemini call below. Safe to call even
+# with no .env file present (no-op in that case); real OS-level environment
+# variables (e.g. already set on this machine) still work exactly as before
+# and take the same precedence they always did.
+load_dotenv()
+
 from fastapi import FastAPI, HTTPException, Query, Body, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
