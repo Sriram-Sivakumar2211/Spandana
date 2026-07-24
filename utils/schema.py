@@ -91,3 +91,16 @@ def validate_prediction_record(record: dict) -> Optional[str]:
         return None
     except jsonschema.exceptions.ValidationError as e:
         return str(e.message)
+
+
+with open(os.path.join(_SCHEMA_DIR, "maintenance_report.json"), "r", encoding="utf-8") as f:
+    MAINTENANCE_REPORT_SCHEMA = json.load(f)
+
+
+def validate_report_record(record: dict) -> Optional[str]:
+    try:
+        jsonschema.validate(instance=record, schema=MAINTENANCE_REPORT_SCHEMA)
+        return None
+    except jsonschema.exceptions.ValidationError as e:
+        return str(e.message)
+

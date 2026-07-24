@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DashboardMachineStatusPayload",
+  "description": "Unified payload sent to the Spandana React/Web Dashboard containing model prediction, RAG retrieval context, and structured LLM report.",
+  "type": "object",
+  "properties": {
+    "machine_id": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["healthy", "warning", "critical"]
+    },
+    "prediction": {
+      "$ref": "model_prediction.json"
+    },
+    "retrieval": {
+      "type": "object",
+      "properties": {
+        "query": { "type": "string" },
+        "chunks": {
+          "type": "array",
+          "items": { "type": "object" }
+        }
+      },
+      "required": ["query", "chunks"]
+    },
+    "report": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "machine_id",
+    "timestamp",
+    "status",
+    "prediction",
+    "retrieval",
+    "report"
+  ],
+  "additionalProperties": true
+}
