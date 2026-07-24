@@ -3,6 +3,8 @@ import json
 import logging
 from typing import Dict, Any, List, Optional
 
+from utils.schema import validate_report_record
+
 logger = logging.getLogger("spandana.llm_generator")
 
 
@@ -34,6 +36,17 @@ class LLMReportGenerator:
         if api_key:
             try:
                 report = self._call_gemini_api(api_key, normalized_pred, retrieved_chunks)
+                # Gemini's JSON mode reliably produced schema-conformant output
+                # in testing, but an LLM's output shape isn't a hard guarantee
+                # the way a schema-validated code path is -- validate before
+                # trusting it, since a malformed field (e.g. recommended_action
+                # as a string instead of a list) would otherwise reach the
+                # frontend's report.recommended_action.map(...) and crash the
+                # whole page with no server-side signal anything went wrong.
+                schema_error = validate_report_record(report) if report else "empty response"
+                if schema_error:
+                    logger.warning(f"Gemini response failed schema validation: {schema_error}. Falling back to grounded rule engine.")
+                    report = None
             except Exception as e:
                 logger.warning(f"Gemini API call failed: {e}. Falling back to grounded rule engine.")
 

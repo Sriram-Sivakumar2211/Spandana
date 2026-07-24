@@ -89,7 +89,19 @@ def _run_inference(machine_id: str, source: Optional[str], features: Optional[Di
             raise HTTPException(status_code=400, detail="'fs' (sample rate) is required when 'signal' is provided for a bearing source.")
         return bearing_engine.predict_from_signal(machine_id, np.array(signal, dtype=np.float32), fs, window_id=window_id)
 
-    if is_bearing and features is not None and all(k in features for k in BEARING_FEATURE_KEYS):
+    if is_bearing and features is not None:
+        missing = [k for k in BEARING_FEATURE_KEYS if k not in features]
+        if missing:
+            # Fail fast rather than silently falling through to the general
+            # model below -- verified this actually happens without this
+            # check: an incomplete bearing feature set would otherwise be
+            # served by a different model with no indication to the caller,
+            # which is exactly the kind of silent degradation this project
+            # has deliberately avoided everywhere else.
+            raise HTTPException(
+                status_code=400,
+                detail=f"Bearing source '{source}' requires all {len(BEARING_FEATURE_KEYS)} bearing feature keys; missing: {missing}",
+            )
         vec = feature_vector_to_array(features)
         return bearing_engine.predict_from_feature_vector(machine_id, vec, window_id=window_id)
 

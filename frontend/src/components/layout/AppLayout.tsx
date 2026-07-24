@@ -1,8 +1,10 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Sidebar } from "./Sidebar";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
+import { ErrorBoundary } from "./ErrorBoundary";
 import { fetchAlerts } from "@/services/spandanaService";
 import type { AlertItem } from "@/types";
 
@@ -12,6 +14,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [connected, setConnected] = useState(false);
   const [search, setSearch] = useState("");
+  const location = useLocation();
 
   useEffect(() => {
     let active = true;
@@ -78,7 +81,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
         />
         <main className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">
-            {children}
+            {/* key=pathname remounts the boundary fresh on every navigation,
+                so a crash on one page doesn't keep showing the error screen
+                after clicking to a different page. */}
+            <ErrorBoundary key={location.pathname}>{children}</ErrorBoundary>
           </div>
           <Footer />
         </main>
