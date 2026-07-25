@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Activity, Cpu, Gauge, Pause, Play, Radio, TriangleAlert } from "lucide-react";
+import { Activity, Cpu, FileText, Gauge, Pause, Play, Radio, TriangleAlert } from "lucide-react";
 import {
   Line,
   LineChart,
@@ -55,7 +55,7 @@ function Stat({
 export default function LiveMonitoring() {
   const [running, setRunning] = useState(true);
   const { replaySpeed } = useSettings();
-  const { series, latest, report, chunks, live } = useLiveInference({
+  const { series, latest, report, chunks, live, generateReport, generatingReport } = useLiveInference({
     machineId: LIVE_MACHINE,
     source: "metropt3",
     running,
@@ -206,7 +206,28 @@ export default function LiveMonitoring() {
         </div>
       </Card>
 
-      {/* Live RAG grounding for the current model state */}
+      {/* RAG grounding — deliberate, on demand */}
+      <Card className="mb-5 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm text-foreground">
+              Generate an AI report from the current model state
+            </p>
+            <p className="text-xs text-muted">
+              Runs the real RAG retrieval + LLM report for the window the
+              model just saw. Triggered manually, not automatically — Gemini's
+              free tier is capped at 20 requests/day, so each click here uses
+              one deliberately instead of the page burning through them on a
+              timer.
+            </p>
+          </div>
+          <Button size="sm" onClick={generateReport} disabled={generatingReport}>
+            <FileText size={15} className={generatingReport ? "animate-pulse" : ""} />
+            {generatingReport ? "Generating…" : "Generate AI Report"}
+          </Button>
+        </div>
+      </Card>
+
       <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
         <div>
           {report ? (
@@ -226,8 +247,8 @@ export default function LiveMonitoring() {
             />
           ) : (
             <Card className="p-8 text-center text-sm text-muted">
-              Generating the first RAG-grounded assessment from the live model
-              state…
+              Click "Generate AI Report" above to see the RAG-grounded
+              assessment for the current live model state.
             </Card>
           )}
         </div>
@@ -238,12 +259,10 @@ export default function LiveMonitoring() {
               What you're watching
             </h3>
             <p className="text-sm text-muted">
-              Each second, a sensor window is streamed through the trained
+              Each tick, a sensor window is streamed through the trained
               Liquid Time-Constant model on the backend. Because the model keeps
               a continuous-time hidden state per machine, the curve reflects the
-              machine's evolving condition — not independent guesses. The RAG
-              panel re-grounds every few windows against the maintenance
-              knowledge base.
+              machine's evolving condition — not independent guesses.
             </p>
           </Card>
         </div>

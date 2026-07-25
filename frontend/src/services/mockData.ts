@@ -142,6 +142,16 @@ export const SIMULATE_SCENARIOS = [
     key: "healthy",
     label: "Healthy Window",
     description: "Real healthy squirrel-cage motor feature vector (verified against the live model).",
+    // Each scenario gets its OWN fixed machine_id, deliberately never shared
+    // with another scenario or with whatever the machine picker has
+    // selected. The LTC keeps real continuous-time state per machine_id
+    // (backend/app.py) -- if two different scenario types shared one
+    // machine_id, clicking between them would mix each scenario's hidden
+    // state into the next one's prediction, making results depend on click
+    // order/history instead of the input just sent. A dedicated ID per
+    // scenario makes every click reproducible regardless of what was
+    // clicked before it.
+    machineId: "DEMO_HEALTHY_MOTOR",
     source: "squirrel_cage",
     // NOT invented: pulled directly from data/unified_schema/squirrel_cage_standardized.jsonl,
     // a real training record labeled "healthy". MetroPT-3 was deliberately
@@ -156,6 +166,7 @@ export const SIMULATE_SCENARIOS = [
     key: "elevated",
     label: "Fault Signature (MetroPT-3)",
     description: "Real MetroPT-3 compressor feature vector, labeled faulty in the source dataset.",
+    machineId: "DEMO_FAULT_MOTOR",
     source: "metropt3",
     // Also not invented: a real record from data/unified_schema/metropt3_standardized.jsonl
     // (ground_truth: "faulty"). Labeled "Fault Signature" rather than
@@ -169,6 +180,7 @@ export const SIMULATE_SCENARIOS = [
     key: "recorded_bearing_fault",
     label: "Recorded Bearing Fault Sample",
     description: "Real 17-dim features extracted from a recorded CWRU inner-race fault signal.",
+    machineId: "DEMO_BEARING_MOTOR",
     source: "cwru",
     features: {
       mean: 0.021, std: 0.2889, rms: 0.2896, variance: 0.0834, peak: 1.5481,

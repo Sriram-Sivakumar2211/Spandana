@@ -12,39 +12,32 @@ import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
 import { useMachines } from "@/hooks/useMachines";
 import { fetchPrediction, fetchReport, simulateWindow } from "@/services/spandanaService";
 import { SIMULATE_SCENARIOS } from "@/services/mockData";
-import type { KnowledgeChunk, MaintenanceReport, Prediction } from "@/types";
+import type { KnowledgeChunk, Machine, MaintenanceReport, Prediction } from "@/types";
 import { cn } from "@/utils/cn";
 
 const BEARING_SOURCES = new Set(["nasa_ims", "cwru", "paderborn"]);
 
-// On a fresh backend, /machines returns [] until a real prediction has ever
-// been made -- with nothing to select, the Simulate buttons would stay
-// disabled forever and there'd be no way to get started. This fallback entry
-// keeps the page usable from a cold start: picking it and clicking Simulate
-// runs the REAL model exactly like any other machine (the backend creates
-// the machine record on first prediction, it doesn't need to pre-exist).
-const DEFAULT_MACHINE = { id: "DEMO_MOTOR_01", name: "Demo Motor 01" };
-
 export default function Predictions() {
   const { machines } = useMachines();
-  const [selected, setSelected] = useState<string>(DEFAULT_MACHINE.id);
+  const [selected, setSelected] = useState<string>("");
   const [prediction, setPrediction] = useState<Prediction | null>(null);
   const [report, setReport] = useState<MaintenanceReport | null>(null);
   const [retrieval, setRetrieval] = useState<{ query: string; chunks: KnowledgeChunk[] } | null>(null);
+  // What's currently shown in the cards below -- kept separate from
+  // `selected` (the machine picker) because a Simulate click displays a
+  // DIFFERENT machine (its own dedicated demo ID, see mockData.ts) than
+  // whatever happens to be selected in the picker. Passing the picker's
+  // machine as context for a simulated result would show the wrong
+  // name/source/location next to it.
+  const [displayMachine, setDisplayMachine] = useState<Machine | undefined>(undefined);
+  const [displaySource, setDisplaySource] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [simulating, setSimulating] = useState<string | null>(null);
 
-  const selectorOptions =
-    machines.length > 0 ? machines.map((m) => ({ id: m.id, name: m.name })) : [DEFAULT_MACHINE];
-  const machine = machines.find((m) => m.id === selected);
-  const modelKind = machine && BEARING_SOURCES.has(String(machine.source)) ? "bearing" : "general";
+  const modelKind = displaySource && BEARING_SOURCES.has(displaySource) ? "bearing" : "general";
 
   useEffect(() => {
-    // Once real machines exist, prefer selecting a real one over the
-    // placeholder -- but only if the user hasn't already picked something.
-    if (machines.length > 0 && selected === DEFAULT_MACHINE.id) {
-      setSelected(machines[0].id);
-    }
+    if (!selected && machines.length > 0) setSelected(machines[0].id);
   }, [machines, selected]);
 
   useEffect(() => {
@@ -57,20 +50,27 @@ export default function Predictions() {
       if (!active) return;
       setPrediction(p.data);
       setReport(r.data);
+      setDisplayMachine(machines.find((m) => m.id === selected));
+      setDisplaySource(machines.find((m) => m.id === selected)?.source ?? null);
       setLoading(false);
     })();
     return () => {
       active = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
 
   const runSimulation = async (scenario: (typeof SIMULATE_SCENARIOS)[number]) => {
-    if (!selected) return;
     setSimulating(scenario.key);
-    const { data } = await simulateWindow(selected, scenario.source, { ...scenario.features });
+    const { data } = await simulateWindow(scenario.machineId, scenario.source, { ...scenario.features });
     setPrediction(data.prediction);
     setReport(data.report);
     setRetrieval(data.retrieval);
+    // The simulated machine won't be in `machines` immediately (that list
+    // refreshes on its own poll), so show it without registry context rather
+    // than pairing it with a stale/unrelated Machine object.
+    setDisplayMachine(undefined);
+    setDisplaySource(scenario.source);
     setSimulating(null);
   };
 
@@ -82,25 +82,8 @@ export default function Predictions() {
         breadcrumbs={[{ label: "Home", to: "/" }, { label: "Predictions" }]}
       />
 
-      {/* Machine selector */}
-      <div className="mb-4 flex flex-wrap gap-2">
-        {selectorOptions.map((m) => (
-          <button
-            key={m.id}
-            onClick={() => setSelected(m.id)}
-            className={cn(
-              "rounded-xl border px-3 py-1.5 text-sm transition-colors",
-              selected === m.id
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-border text-muted hover:text-foreground",
-            )}
-          >
-            {m.name}
-          </button>
-        ))}
-      </div>
-
-      {/* Simulate controls */}
+      {/* Simulate controls -- always available, each button uses its own
+          dedicated machine so results never depend on click order. */}
       <Card className="mb-5 p-4">
         <p className="mb-3 text-xs uppercase tracking-wide text-muted">
           Simulate a sensor window (runs the real model + RAG pipeline)
@@ -111,7 +94,7 @@ export default function Predictions() {
               key={s.key}
               variant="secondary"
               size="sm"
-              disabled={!selected || simulating !== null}
+              disabled={simulating !== null}
               onClick={() => runSimulation(s)}
               title={s.description}
             >
@@ -122,6 +105,32 @@ export default function Predictions() {
         </div>
       </Card>
 
+      {/* Machine selector -- browse an already-predicted real machine's
+          latest result, separate from the Simulate demo scenarios above. */}
+      {machines.length > 0 && (
+        <div className="mb-4">
+          <p className="mb-2 text-xs uppercase tracking-wide text-muted">
+            Or browse a real machine's latest prediction
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {machines.map((m) => (
+              <button
+                key={m.id}
+                onClick={() => setSelected(m.id)}
+                className={cn(
+                  "rounded-xl border px-3 py-1.5 text-sm transition-colors",
+                  selected === m.id && !simulating
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted hover:text-foreground",
+                )}
+              >
+                {m.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
         <div className="space-y-5">
           {loading || !prediction ? (
@@ -130,7 +139,7 @@ export default function Predictions() {
             <PredictionCard prediction={prediction} />
           )}
           {report && (
-            <ReportCard report={report} machine={machine} onDownload={() => {
+            <ReportCard report={report} machine={displayMachine} onDownload={() => {
               const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
               const url = URL.createObjectURL(blob);
               const a = document.createElement("a");

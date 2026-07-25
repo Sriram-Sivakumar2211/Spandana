@@ -96,15 +96,15 @@ export default function Dashboard() {
   const { replaySpeed } = useSettings();
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
 
-  // Real, low-frequency live inference for the dashboard health pulse (no RAG
-  // calls here -- ragEvery is set high so this stays a lightweight real curve).
+  // Real live inference for the dashboard health pulse. useLiveInference
+  // never calls the RAG+Gemini pipeline on its own (see the hook's module
+  // comment) -- this stays a lightweight real curve with zero Gemini calls.
   const { series, latest, live } = useLiveInference({
     machineId: "DASH_LIVE_MOTOR",
     source: "metropt3",
     running: true,
     replaySpeed,
     window: 28,
-    ragEvery: 9999,
   });
 
   const summary = useMemo(() => {

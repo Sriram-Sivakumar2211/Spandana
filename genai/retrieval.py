@@ -70,8 +70,14 @@ class KnowledgeBaseLoader:
             if not sec_text:
                 continue
 
+            # The first "section" is whatever precedes the first "## " header
+            # -- i.e. just the "# Doc Title" line itself (plus maybe a short
+            # intro line). Matching a single "#" here as well as "##" meant
+            # that first chunk's title became "Doc Title — Doc Title" (the
+            # H1 line matched both doc_title above and sec_title_match here).
+            # Only "##" is a genuine section heading.
             sec_title = doc_title
-            sec_title_match = re.search(r"^##?\s+(.+)$", sec_text, re.MULTILINE)
+            sec_title_match = re.search(r"^##\s+(.+)$", sec_text, re.MULTILINE)
             if sec_title_match:
                 sec_title = f"{doc_title} — {sec_title_match.group(1).strip()}"
 

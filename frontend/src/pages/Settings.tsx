@@ -145,14 +145,17 @@ export default function Settings() {
               aria-checked={notificationsEnabled}
               aria-label="Toggle notifications"
               className={cn(
-                "relative h-6 w-11 rounded-full transition-colors",
+                "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full p-0 transition-colors",
                 notificationsEnabled ? "bg-primary" : "bg-foreground/20",
               )}
             >
+              {/* left-0.5 pins the knob's rest position explicitly -- without
+                  it the knob had no defined starting x-offset and the
+                  translate-x math landed inconsistently across browsers. */}
               <span
                 className={cn(
-                  "absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform",
-                  notificationsEnabled ? "translate-x-5" : "translate-x-0.5",
+                  "absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform",
+                  notificationsEnabled ? "translate-x-5" : "translate-x-0",
                 )}
               />
             </button>

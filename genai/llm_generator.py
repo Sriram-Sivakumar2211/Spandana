@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import logging
 from typing import Dict, Any, List, Optional
@@ -6,6 +7,14 @@ from typing import Dict, Any, List, Optional
 from utils.schema import validate_report_record
 
 logger = logging.getLogger("spandana.llm_generator")
+
+# Matches a genuine markdown list item: "- ...", "* ...", "1. ...", "[ ] ...",
+# "[x] ...". Used to tell real checklist/action lines apart from headers
+# ("## Pre-Inspection Safety Protocol") and prose -- both of which used to
+# get scooped up by a looser line filter and shown as if they were
+# recommended actions, which read as nonsensical in the UI.
+_LIST_ITEM_RE = re.compile(r"^(?:-|\*|\d+\.)\s+")
+_CHECKBOX_RE = re.compile(r"^\[[ xX]\]\s*")
 
 
 class LLMReportGenerator:
@@ -105,6 +114,37 @@ class LLMReportGenerator:
             )
         return "\n".join(formatted)
 
+    def _extract_actionable_lines(self, text: str, limit: int) -> List[str]:
+        """
+        Pulls genuine checklist/action items out of a knowledge-base section --
+        only lines actually written as a bullet, numbered, or checkbox list
+        item, never a markdown heading or a prose sentence. The previous
+        version matched ANY line over 20 characters, which meant section
+        headings like "## Pre-Inspection Safety Protocol" or a document's own
+        title were shown in the UI as if they were recommended actions --
+        confusing, since a heading isn't an instruction.
+        """
+        actions: List[str] = []
+        if limit <= 0:
+            return actions
+        for raw_line in text.split("\n"):
+            line = raw_line.strip()
+            if not line or not _LIST_ITEM_RE.match(line):
+                continue
+            # "- [ ] Verify..." is a bullet AND a checkbox stacked -- strip
+            # the bullet marker first, then the checkbox that follows it.
+            cleaned = _LIST_ITEM_RE.sub("", line)
+            cleaned = _CHECKBOX_RE.sub("", cleaned)
+            cleaned = cleaned.replace("**", "").strip()
+            cleaned = cleaned.rstrip(".") + "."
+            if len(cleaned) < 15 or len(cleaned) > 220:
+                continue
+            if cleaned not in actions:
+                actions.append(cleaned)
+            if len(actions) >= limit:
+                break
+        return actions
+
     def _generate_grounded_fallback(self, pred: Dict[str, Any], chunks: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         Deterministic, hallucination-free report synthesizer used when LLM API is unavailable.
@@ -141,26 +181,39 @@ class LLMReportGenerator:
         if rul is not None:
             evidence.append(f"Linear trend extrapolation RUL: {rul:.1f} hours remaining.")
 
-        # Grounded cause & actions from retrieved knowledge chunks
-        likely_cause = f"Model output indicates signature corresponding to {fault}."
+        # Grounded cause, tailored per severity rather than one generic
+        # sentence reused for every outcome including "healthy" (where
+        # claiming to have "verified matching spectral and impact patterns"
+        # made no sense -- a healthy reading has no fault pattern to match).
+        top_chunk = chunks[0] if chunks else None
+        if severity == "healthy":
+            likely_cause = "Model output shows no fault signature present."
+            if top_chunk:
+                likely_cause += f" Cross-checked against '{top_chunk['title']}', consistent with normal operating parameters."
+        else:
+            likely_cause = f"Model output indicates a signature consistent with '{fault}'."
+            if top_chunk:
+                likely_cause += f" Reference: '{top_chunk['title']}' ({top_chunk['source_file']})."
+
+        # Actions: the model's own rule-based recommendation first, then real
+        # checklist items pulled from the top retrieved chunks (never
+        # headers/titles -- see _extract_actionable_lines).
         recommended_actions = [pred["recommended_action"]]
-        notes = "Enforce Lockout/Tagout (LOTO) protocols prior to physical inspection."
+        for c in chunks[:2]:
+            remaining = 4 - len(recommended_actions)
+            if remaining <= 0:
+                break
+            for action in self._extract_actionable_lines(c["text"], remaining):
+                if action not in recommended_actions:
+                    recommended_actions.append(action)
 
-        if chunks:
-            top_chunk = chunks[0]
-            likely_cause += f" Reference doc ({top_chunk['title']}): verified matching spectral and impact patterns."
-
-            for c in chunks[:2]:
-                text = c["text"]
-                # Extract bullet items or action lines from retrieved text if present
-                for line in text.split("\n"):
-                    line_clean = line.strip(" -*#0123456789.")
-                    if len(line_clean) > 20 and not line_clean.startswith("Diagnostic") and not line_clean.startswith("Overview"):
-                        if line_clean not in recommended_actions and len(recommended_actions) < 4:
-                            recommended_actions.append(line_clean)
-
-                if "LOTO" in text or "Safety" in text or "PPE" in text:
-                    notes += " Verify PPE and zero energy state before servicing."
+        # Safety note only makes sense when physical inspection is actually
+        # being recommended -- a healthy machine needing "no action" doesn't
+        # need a LOTO/PPE warning attached to it.
+        if severity == "healthy":
+            notes = "No physical intervention required at this time; continue routine monitoring."
+        else:
+            notes = "Enforce Lockout/Tagout (LOTO) protocols and verify PPE (safety glasses, gloves, ear protection) before any physical inspection or servicing."
 
         return {
             "machine_id": pred["machine_id"],

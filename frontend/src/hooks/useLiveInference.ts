@@ -1,19 +1,24 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { DashboardMachineStatus, MaintenanceReport, KnowledgeChunk } from "@/types";
 import { runPrediction, simulateWindow, isBackendLive } from "@/services/spandanaService";
 
 /*
   Streams REAL model output. Each tick sends one sensor window (a scripted
   degradation profile, since there is no physical sensor attached) to the
-  actual trained LTC via the backend and plots what the MODEL returns --
+  actual trained LTC via POST /predict and plots what the MODEL returns --
   health_score, anomaly_score, fault_probability are genuine inference, not a
   client-side animation. The input profile drifts a machine from healthy
   toward a fault and back, so you watch the model's real assessment respond.
 
-  Fast path: POST /predict every tick (real LTC, low latency). Every
-  `ragEvery` ticks it instead uses POST /api/v1/sensor-stream, which also runs
-  the real RAG retrieval + report, so the RAG panel refreshes with genuinely
-  retrieved knowledge without bottlenecking the chart.
+  The chart loop deliberately NEVER calls the RAG+Gemini pipeline
+  automatically. Google's free-tier Gemini quota is 20 requests/day; an
+  earlier version of this hook called it on a timer (every few ticks) and
+  exhausted the entire day's quota within minutes of the page being open,
+  after which every report anywhere in the app silently fell back to the
+  offline generator. generateReport() below is the only way to trigger a
+  RAG+Gemini call from this page, and it only runs when explicitly invoked
+  (a button click), so the number of Gemini calls made is always exactly the
+  number of times a person chose to make one.
 */
 
 export interface LivePoint {
@@ -68,7 +73,6 @@ interface Options {
   running: boolean;
   replaySpeed: number;
   window?: number;
-  ragEvery?: number;
 }
 
 export function useLiveInference({
@@ -77,16 +81,16 @@ export function useLiveInference({
   running,
   replaySpeed,
   window: windowSize = 40,
-  ragEvery = 6,
 }: Options) {
   const [series, setSeries] = useState<LivePoint[]>([]);
   const [dashboard, setDashboard] = useState<DashboardMachineStatus | null>(null);
   const [report, setReport] = useState<MaintenanceReport | null>(null);
   const [chunks, setChunks] = useState<KnowledgeChunk[]>([]);
   const [live, setLive] = useState(false);
-  const tickRef = useRef(0);
+  const [generatingReport, setGeneratingReport] = useState(false);
   const phaseRef = useRef(0);
   const dirRef = useRef(1);
+  const lastFeaturesRef = useRef<Record<string, number>>(driftWindow(0));
 
   useEffect(() => {
     if (!running) return;
@@ -99,44 +103,27 @@ export function useLiveInference({
       if (phaseRef.current <= 0) { phaseRef.current = 0; dirRef.current = 1; }
 
       const features = driftWindow(phaseRef.current);
+      lastFeaturesRef.current = features;
       const now = new Date();
       const label = now.toLocaleTimeString(undefined, {
         hour: "2-digit", minute: "2-digit", second: "2-digit",
       });
-      const isRagTick = tickRef.current % ragEvery === 0;
-      tickRef.current += 1;
 
-      if (isRagTick) {
-        const { data } = await simulateWindow(machineId, source, features);
-        if (!active) return;
-        setDashboard(data);
-        setReport(data.report);
-        setChunks(data.retrieval?.chunks ?? []);
-        pushPoint(data.prediction, label);
-      } else {
-        const { data } = await runPrediction(machineId, source, features);
-        if (!active) return;
-        pushPoint(data, label);
-      }
-      setLive(isBackendLive());
-    };
-
-    const pushPoint = (
-      p: { health_score: number; anomaly_score: number; fault_probability: number; predicted_fault: string; prediction_confidence: number },
-      label: string,
-    ) => {
+      const { data } = await runPrediction(machineId, source, features);
+      if (!active) return;
       setSeries((prev) => {
         const point: LivePoint = {
           label,
-          health: p.health_score,
-          anomaly: Number((p.anomaly_score * 100).toFixed(1)),
-          fault: Number((p.fault_probability * 100).toFixed(1)),
-          predicted_fault: p.predicted_fault,
-          confidence: p.prediction_confidence,
+          health: data.health_score,
+          anomaly: Number((data.anomaly_score * 100).toFixed(1)),
+          fault: Number((data.fault_probability * 100).toFixed(1)),
+          predicted_fault: data.predicted_fault,
+          confidence: data.prediction_confidence,
         };
         const next = [...prev, point];
         return next.length > windowSize ? next.slice(next.length - windowSize) : next;
       });
+      setLive(isBackendLive());
     };
 
     const intervalMs = Math.max(350, 1500 / replaySpeed);
@@ -146,7 +133,22 @@ export function useLiveInference({
       active = false;
       globalThis.clearInterval(id);
     };
-  }, [machineId, source, running, replaySpeed, windowSize, ragEvery]);
+  }, [machineId, source, running, replaySpeed, windowSize]);
+
+  // Deliberate, single RAG+Gemini call using the model's current input window
+  // -- call this from a button, never automatically. See module comment.
+  const generateReport = useCallback(async () => {
+    setGeneratingReport(true);
+    try {
+      const { data } = await simulateWindow(machineId, source, lastFeaturesRef.current);
+      setDashboard(data);
+      setReport(data.report);
+      setChunks(data.retrieval?.chunks ?? []);
+      setLive(isBackendLive());
+    } finally {
+      setGeneratingReport(false);
+    }
+  }, [machineId, source]);
 
   return {
     series,
@@ -155,5 +157,7 @@ export function useLiveInference({
     report,
     chunks,
     live,
+    generateReport,
+    generatingReport,
   };
 }
