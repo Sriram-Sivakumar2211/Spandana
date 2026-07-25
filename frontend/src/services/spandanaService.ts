@@ -180,6 +180,27 @@ export async function assessMachine(machineId: string) {
 }
 
 /**
+ * Clears a machine's LTC hidden state (POST /machines/{id}/reset). The model
+ * is deterministic -- identical input + identical hidden state always
+ * produces an identical output, which is correct behavior, but it means a
+ * machine_id that's been fed the same repeated demo window many times
+ * settles into a fixed point and stops changing at all. Called before each
+ * Predictions-page "Simulate" click so every click starts from the same
+ * known-clean baseline instead of whatever state accumulated from however
+ * many times that button was clicked before (including during testing).
+ * Silently no-ops if the backend is unreachable -- resetting is a courtesy
+ * for demo cleanliness, not something that should block a prediction if it
+ * fails.
+ */
+export async function resetMachine(machineId: string): Promise<void> {
+  try {
+    await api.post(`/machines/${encodeURIComponent(machineId)}/reset`);
+  } catch {
+    // offline/unreachable -- simulateWindow's own fallback still applies
+  }
+}
+
+/**
  * Runs ONE real LTC inference via POST /predict -- the fast path (real trained
  * model, no RAG report generation), so Live Monitoring can stream a genuine
  * model-output curve at ~1s cadence. Every call advances that machine's

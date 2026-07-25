@@ -374,6 +374,22 @@ def get_machine_endpoint(machine_id: str):
     return machine
 
 
+@app.post("/machines/{machine_id}/reset")
+def reset_machine_endpoint(machine_id: str):
+    """
+    Clears a machine's LTC hidden state (hx) on both engines, so its next
+    prediction starts from a fresh, deterministic baseline instead of
+    whatever state accumulated from however many prior windows it's been
+    fed. Both engines already exposed reset_machine() for exactly this
+    (inference/predict.py, inference/predict_general.py); this just wires it
+    up over the API. Does not clear /machines or /predictions/history --
+    only the model's internal continuous-time memory.
+    """
+    bearing_engine.reset_machine(machine_id)
+    general_engine.reset_machine(machine_id)
+    return {"machine_id": machine_id, "reset": True}
+
+
 @app.get("/predictions/latest")
 def latest_predictions_endpoint():
     """Most recent prediction per known machine."""

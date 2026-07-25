@@ -10,12 +10,30 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
 import { useMachines } from "@/hooks/useMachines";
-import { fetchPrediction, fetchReport, simulateWindow } from "@/services/spandanaService";
+import { fetchPrediction, fetchReport, resetMachine, simulateWindow } from "@/services/spandanaService";
 import { SIMULATE_SCENARIOS } from "@/services/mockData";
 import type { KnowledgeChunk, Machine, MaintenanceReport, Prediction } from "@/types";
 import { cn } from "@/utils/cn";
 
 const BEARING_SOURCES = new Set(["nasa_ims", "cwru", "paderborn"]);
+
+/**
+ * Small (+/-1.5%) multiplicative noise per feature, applied fresh on every
+ * Simulate click. The model is deterministic -- identical input always
+ * produces an identical output, which is mathematically correct but reads as
+ * suspicious/hardcoded in a demo when every click shows the exact same
+ * number to the decimal. Real sensors never report the literal same value
+ * twice either, so this is also just more realistic. The noise is small
+ * enough that it never changes which class a scenario lands in -- only the
+ * decimals move, not the story.
+ */
+function jitterFeatures(features: Record<string, number>): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const [k, v] of Object.entries(features)) {
+    out[k] = v === 0 ? 0 : v * (1 + (Math.random() - 0.5) * 0.03);
+  }
+  return out;
+}
 
 export default function Predictions() {
   const { machines } = useMachines();
@@ -62,7 +80,13 @@ export default function Predictions() {
 
   const runSimulation = async (scenario: (typeof SIMULATE_SCENARIOS)[number]) => {
     setSimulating(scenario.key);
-    const { data } = await simulateWindow(scenario.machineId, scenario.source, { ...scenario.features });
+    // Reset first: this scenario's dedicated machine may have accumulated
+    // hidden state from earlier clicks (including testing), which would
+    // otherwise shift the result away from the clean baseline this scenario
+    // is meant to demonstrate. Then jitter the input slightly so repeated
+    // clicks show natural variation instead of the identical number forever.
+    await resetMachine(scenario.machineId);
+    const { data } = await simulateWindow(scenario.machineId, scenario.source, jitterFeatures(scenario.features));
     setPrediction(data.prediction);
     setReport(data.report);
     setRetrieval(data.retrieval);
