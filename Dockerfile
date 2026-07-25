@@ -15,7 +15,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Create a non-root user (Required for Hugging Face Spaces and Render)
+# Create a non-root user
 RUN useradd -m -u 1000 user
 
 # Copy the rest of the application files
@@ -29,8 +29,9 @@ USER user
 ENV HOME=/home/user \
     PATH=/home/user/.local/bin:$PATH
 
-# Expose port 7860 (Default for Hugging Face Spaces)
-EXPOSE 7860
+# Render and other clouds inject a PORT environment variable, we default to 8000
+ENV PORT=8000
+EXPOSE $PORT
 
-# Start the application
-CMD ["uvicorn", "backend.app:app", "--host", "0.0.0.0", "--port", "7860"]
+# Start the application using the PORT environment variable
+CMD uvicorn backend.app:app --host 0.0.0.0 --port $PORT
