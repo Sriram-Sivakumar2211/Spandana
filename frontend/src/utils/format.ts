@@ -65,3 +65,13 @@ export function clamp(v: number, min = 0, max = 100): number {
 export function formatMaybe(v: number | null | undefined, decimals = 1): string {
   return v === null || v === undefined ? "—" : v.toFixed(decimals);
 }
+
+/**
+ * Real RPM readings can come back with long floating-point tails (e.g. from
+ * an inverse-normalized model feature). Cap at 4 decimal places and strip
+ * trailing zeros via the Number round-trip, so a clean integer like 1480
+ * still prints "1480" instead of "1480.0000".
+ */
+export function formatRpm(v: number | null | undefined): string {
+  return v === null || v === undefined ? "—" : String(Number(v.toFixed(4)));
+}

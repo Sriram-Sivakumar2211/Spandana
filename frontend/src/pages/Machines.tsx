@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { MachineCard } from "@/components/features/MachineCard";
@@ -19,8 +20,18 @@ const FILTERS: { key: HealthStatus | "all"; label: string }[] = [
 
 export default function Machines() {
   const { machines, loading } = useMachines();
-  const [query, setQuery] = useState("");
+  const [searchParams] = useSearchParams();
+  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [filter, setFilter] = useState<HealthStatus | "all">("all");
+
+  // The navbar search's "See all results" link and Enter-to-search both land
+  // here as /machines?q=..., so re-sync whenever that param changes -- not
+  // just on first mount, since navigating here again while already on this
+  // page doesn't remount the component.
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q !== null) setQuery(q);
+  }, [searchParams]);
 
   const filtered = useMemo(() => {
     return machines.filter((m) => {

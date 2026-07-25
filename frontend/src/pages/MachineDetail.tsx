@@ -12,7 +12,7 @@ import { EmptyState } from "@/components/ui/States";
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
 import { useMachines } from "@/hooks/useMachines";
 import { assessMachine } from "@/services/spandanaService";
-import { formatMaybe, formatSource } from "@/utils/format";
+import { formatMaybe, formatRpm, formatSource } from "@/utils/format";
 import type { DashboardMachineStatus } from "@/types";
 
 export default function MachineDetail() {
@@ -63,7 +63,7 @@ export default function MachineDetail() {
   const specs = [
     { icon: Thermometer, label: "Temperature", value: `${formatMaybe(machine.temperature, 1)} °C` },
     { icon: Zap, label: "Current", value: `${formatMaybe(machine.current, 1)} A` },
-    { icon: Wind, label: "RPM", value: machine.rpm === null ? "—" : String(machine.rpm) },
+    { icon: Wind, label: "RPM", value: formatRpm(machine.rpm) },
     { icon: Gauge, label: "Vibration", value: `${formatMaybe(machine.vibration, 2)} mm/s` },
   ];
 

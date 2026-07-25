@@ -7,6 +7,7 @@ import { Footer } from "./Footer";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { fetchAlerts } from "@/services/spandanaService";
 import { useSettings } from "@/context/SettingsContext";
+import { useMachines } from "@/hooks/useMachines";
 import type { AlertItem } from "@/types";
 
 export function AppLayout({ children }: { children: ReactNode }) {
@@ -17,6 +18,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [search, setSearch] = useState("");
   const location = useLocation();
   const { notificationsEnabled } = useSettings();
+  const { machines } = useMachines();
 
   useEffect(() => {
     // Notifications toggle genuinely controls this: when off, we stop polling
@@ -87,6 +89,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           search={search}
           onSearch={setSearch}
           showNotifications={notificationsEnabled}
+          machines={machines}
         />
         <main className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">

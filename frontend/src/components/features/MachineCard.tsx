@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { statusColor } from "@/utils/status";
-import { formatFault, formatMaybe, formatSource, timeAgo } from "@/utils/format";
+import { formatFault, formatMaybe, formatRpm, formatSource, timeAgo } from "@/utils/format";
 import type { Machine } from "@/types";
 
 function Metric({
@@ -18,10 +18,10 @@ function Metric({
   unit: string;
 }) {
   return (
-    <div className="flex items-center gap-2">
-      <Icon size={15} className="text-muted" />
-      <span className="text-sm text-foreground tnum">{value}</span>
-      <span className="text-xs text-muted">{unit}</span>
+    <div className="flex min-w-0 items-center gap-2">
+      <Icon size={15} className="shrink-0 text-muted" />
+      <span className="truncate text-sm text-foreground tnum">{value}</span>
+      <span className="shrink-0 text-xs text-muted">{unit}</span>
     </div>
   );
 }
@@ -62,7 +62,7 @@ export function MachineCard({ machine, index = 0 }: { machine: Machine; index?: 
 
         <div className="mt-4 grid grid-cols-2 gap-3">
           <Metric icon={Thermometer} value={formatMaybe(machine.temperature, 1)} unit="°C" />
-          <Metric icon={Wind} value={machine.rpm === null ? "—" : String(machine.rpm)} unit="rpm" />
+          <Metric icon={Wind} value={formatRpm(machine.rpm)} unit="rpm" />
           <Metric icon={Zap} value={formatMaybe(machine.current, 1)} unit="A" />
           <Metric icon={Gauge} value={formatMaybe(machine.vibration, 2)} unit="mm/s" />
         </div>

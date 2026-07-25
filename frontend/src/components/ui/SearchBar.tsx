@@ -6,6 +6,8 @@ interface SearchBarProps {
   onChange: (v: string) => void;
   placeholder?: string;
   className?: string;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 export function SearchBar({
@@ -13,6 +15,8 @@ export function SearchBar({
   onChange,
   placeholder = "Search machines…",
   className,
+  onFocus,
+  onBlur,
 }: SearchBarProps) {
   return (
     <div className={cn("relative", className)}>
@@ -24,6 +28,8 @@ export function SearchBar({
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onFocus={onFocus}
+        onBlur={onBlur}
         placeholder={placeholder}
         aria-label={placeholder}
         className="h-10 w-full rounded-xl border border-border bg-background pl-9 pr-3 text-sm text-foreground placeholder:text-muted focus:border-primary focus:outline-none"
