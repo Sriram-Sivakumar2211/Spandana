@@ -7,7 +7,7 @@ scikit-learn==1.7.2
 PyWavelets==1.8.0
 matplotlib==3.10.9
 seaborn==0.13.2
-tensorboard==2.21.0
+# tensorboard removed - only needed for training, not deployment
 tqdm==4.69.1
 joblib==1.5.1
 pyarrow==20.0.0
@@ -24,4 +24,4 @@ click==8.1.8
 # genai/llm_generator.py. Without it (or without GEMINI_API_KEY set), the
 # backend automatically falls back to the deterministic grounded rule engine.
 google-generativeai==0.8.5
-protobuf==6.31.1
+protobuf==5.29.4
