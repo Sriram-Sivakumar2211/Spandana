@@ -16,7 +16,7 @@ ncps
 Pillow
 jsonschema
 fastapi
-uvicorn[standard]
+uvicorn
 python-dotenv
 
 # Optional: enables the real Gemini-backed maintenance report generator in
