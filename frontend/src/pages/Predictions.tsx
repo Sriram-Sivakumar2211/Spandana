@@ -17,20 +17,34 @@ import { cn } from "@/utils/cn";
 
 const BEARING_SOURCES = new Set(["nasa_ims", "cwru", "paderborn"]);
 
+// On a fresh backend, /machines returns [] until a real prediction has ever
+// been made -- with nothing to select, the Simulate buttons would stay
+// disabled forever and there'd be no way to get started. This fallback entry
+// keeps the page usable from a cold start: picking it and clicking Simulate
+// runs the REAL model exactly like any other machine (the backend creates
+// the machine record on first prediction, it doesn't need to pre-exist).
+const DEFAULT_MACHINE = { id: "DEMO_MOTOR_01", name: "Demo Motor 01" };
+
 export default function Predictions() {
   const { machines } = useMachines();
-  const [selected, setSelected] = useState<string>("");
+  const [selected, setSelected] = useState<string>(DEFAULT_MACHINE.id);
   const [prediction, setPrediction] = useState<Prediction | null>(null);
   const [report, setReport] = useState<MaintenanceReport | null>(null);
   const [retrieval, setRetrieval] = useState<{ query: string; chunks: KnowledgeChunk[] } | null>(null);
   const [loading, setLoading] = useState(false);
   const [simulating, setSimulating] = useState<string | null>(null);
 
+  const selectorOptions =
+    machines.length > 0 ? machines.map((m) => ({ id: m.id, name: m.name })) : [DEFAULT_MACHINE];
   const machine = machines.find((m) => m.id === selected);
   const modelKind = machine && BEARING_SOURCES.has(String(machine.source)) ? "bearing" : "general";
 
   useEffect(() => {
-    if (!selected && machines.length > 0) setSelected(machines[0].id);
+    // Once real machines exist, prefer selecting a real one over the
+    // placeholder -- but only if the user hasn't already picked something.
+    if (machines.length > 0 && selected === DEFAULT_MACHINE.id) {
+      setSelected(machines[0].id);
+    }
   }, [machines, selected]);
 
   useEffect(() => {
@@ -70,7 +84,7 @@ export default function Predictions() {
 
       {/* Machine selector */}
       <div className="mb-4 flex flex-wrap gap-2">
-        {machines.map((m) => (
+        {selectorOptions.map((m) => (
           <button
             key={m.id}
             onClick={() => setSelected(m.id)}

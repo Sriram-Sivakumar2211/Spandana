@@ -25,21 +25,38 @@ export interface LivePoint {
   confidence: number;
 }
 
+// Both endpoints are real training records, not invented numbers -- same
+// values as services/mockData.ts::SIMULATE_SCENARIOS, pulled from
+// data/unified_schema/{squirrel_cage,metropt3}_standardized.jsonl. Chosen
+// deliberately: MetroPT-3 has zero "healthy"-labeled records in this project
+// (100% "faulty") and squirrel-cage has zero "faulty" records (100%
+// "healthy"), so a genuine healthy<->fault drift needs one endpoint from
+// each. The "source" field only matters for routing bearing vs. general
+// model (see backend/app.py::_run_inference), so blending across these two
+// non-bearing sources is safe -- both are served by the same general model.
 const HEALTHY: Record<string, number> = {
-  rms: 0.42, kurtosis: 3.0, skewness: 0.1, crest_factor: 3.2,
-  dominant_frequency: 50, temperature: 62, current: 4.2, rpm: 1480,
+  rms: 0.2465, kurtosis: 3.0, skewness: 0.0, crest_factor: 4.5725,
+  dominant_frequency: 0.0, temperature: 0.2187, current: 4.0, rpm: 1480,
+  hotspot_ratio: 0.15, hotspot_intensity: 0.7317,
 };
 const FAULT: Record<string, number> = {
-  rms: 2.7, kurtosis: 5.4, skewness: 0.95, crest_factor: 5.8,
-  dominant_frequency: 165, temperature: 87, current: 6.3, rpm: 1508,
+  rms: 0.04, kurtosis: 7.0, skewness: -0.0, crest_factor: 1.0623,
+  dominant_frequency: 0.3, temperature: 53.05, current: 0.04, rpm: 1480,
+  tp2_pressure: -0.013, tp3_pressure: 9.0586,
 };
-const KEYS = Object.keys(HEALTHY);
+const KEYS = Array.from(new Set([...Object.keys(HEALTHY), ...Object.keys(FAULT)]));
 
 function driftWindow(phase: number): Record<string, number> {
   // phase 0 -> healthy, 1 -> fault; small noise so successive windows differ.
+  // HEALTHY/FAULT are two different real records with slightly different
+  // populated keys (e.g. hotspot_* only on the healthy side, tp2/tp3_pressure
+  // only on the fault side) -- missing on one side defaults to 0, matching
+  // fill_feature_vector's own zero-fill semantics, not an arbitrary choice.
   const f: Record<string, number> = {};
   for (const k of KEYS) {
-    const base = HEALTHY[k] + (FAULT[k] - HEALTHY[k]) * phase;
+    const h = HEALTHY[k] ?? 0;
+    const ft = FAULT[k] ?? 0;
+    const base = h + (ft - h) * phase;
     f[k] = base * (1 + (Math.random() - 0.5) * 0.05);
   }
   return f;

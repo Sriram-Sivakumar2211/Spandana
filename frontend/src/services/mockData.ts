@@ -141,16 +141,29 @@ export const SIMULATE_SCENARIOS = [
   {
     key: "healthy",
     label: "Healthy Window",
-    description: "Representative nominal MetroPT-3 compressor reading.",
-    source: "metropt3",
-    features: { rms: 0.42, kurtosis: 3.0, skewness: 0.1, crest_factor: 3.2, dominant_frequency: 50, temperature: 62, current: 4.2, rpm: 1480 },
+    description: "Real healthy squirrel-cage motor feature vector (verified against the live model).",
+    source: "squirrel_cage",
+    // NOT invented: pulled directly from data/unified_schema/squirrel_cage_standardized.jsonl,
+    // a real training record labeled "healthy". MetroPT-3 was deliberately
+    // NOT used here -- its 4,995 standardized records are 100% labeled
+    // "faulty" (disclosed in reports/cross_modality_report.md), so no
+    // MetroPT-3-sourced input can honestly demonstrate a "healthy" result;
+    // squirrel-cage's 321 records are 100% "healthy", the correct source for
+    // this scenario. Verified live: general model returns "healthy".
+    features: { rms: 0.2465, kurtosis: 3.0, skewness: 0.0, crest_factor: 4.5725, dominant_frequency: 0.0, temperature: 0.2187, current: 4.0, rpm: 1480, hotspot_ratio: 0.15, hotspot_intensity: 0.7317 },
   },
   {
     key: "elevated",
-    label: "Elevated Wear",
-    description: "Representative degraded MetroPT-3 reading (elevated temperature & current).",
+    label: "Fault Signature (MetroPT-3)",
+    description: "Real MetroPT-3 compressor feature vector, labeled faulty in the source dataset.",
     source: "metropt3",
-    features: { rms: 1.4, kurtosis: 4.1, skewness: 0.6, crest_factor: 4.6, dominant_frequency: 118, temperature: 78, current: 5.4, rpm: 1495 },
+    // Also not invented: a real record from data/unified_schema/metropt3_standardized.jsonl
+    // (ground_truth: "faulty"). Labeled "Fault Signature" rather than
+    // "Elevated Wear"/"Warning" because MetroPT-3 has zero "warning"-labeled
+    // examples -- like every source in this project, it's strictly
+    // healthy-or-faulty, so claiming a "warning" result here would be
+    // fabricated, not measured.
+    features: { rms: 0.04, kurtosis: 7.0, skewness: -0.0, crest_factor: 1.0623, dominant_frequency: 0.3, temperature: 53.05, current: 0.04, rpm: 1480, tp2_pressure: -0.013, tp3_pressure: 9.0586 },
   },
   {
     key: "recorded_bearing_fault",
