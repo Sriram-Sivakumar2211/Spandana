@@ -1,4 +1,7 @@
+
 # Spandana — Affordable Real-Time Predictive Maintenance for MSMEs
+
+> 🚀 **Live Demo:** [Click here to launch Spandana Live](YOUR_RENDER_URL_HERE) *(Hosted on Render)*
 
 This repository unifies two datasets tracks -- Member 1's electro-mechanical sensors (**MetroPT-3** air compressor, **squirrel-cage motor**, **thermal-imaging motor**) and Member 2's bearing-vibration rigs (**NASA IMS**, **CWRU**, **Paderborn**) -- into one shared input/output schema, and serves both a bearing-specific specialist model and a general cross-dataset severity model from that shared foundation.
 
