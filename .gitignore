@@ -19,6 +19,33 @@ __pycache__/
 .venv/
 node_modules/
 
+# Runtime-required model/scaler files -- backend/app.py loads these directly
+# at startup (see LTCInferenceEngine / GeneralLTCInferenceEngine construction).
+# Everything else in the directories above stays ignored (raw/processed
+# training data, extra experiment checkpoints not used at inference time).
+!data/unified/
+data/unified/*
+!data/unified/feature_scaler.json
+
+!data/unified_schema/
+data/unified_schema/*
+!data/unified_schema/feature_scaler.json
+
+!data/checkpoints/
+data/checkpoints/*
+
+!data/checkpoints/lnn/
+data/checkpoints/lnn/*
+!data/checkpoints/lnn/best_ltc.pt
+
+!data/checkpoints/vae/
+data/checkpoints/vae/*
+!data/checkpoints/vae/healthy_vae.pt
+
+!data/checkpoints/ltc_general_augmented/
+data/checkpoints/ltc_general_augmented/*
+!data/checkpoints/ltc_general_augmented/best_ltc_general.pt
+
 # Environment / secrets -- never commit real values, only .env.example
 .env
 .env.local
