@@ -33,7 +33,6 @@ app = FastAPI(
     description="Backend API for Member 3 RAG maintenance intelligence and dashboard integration.",
     version="1.0.0"
 )
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -41,7 +40,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # Services initialization
 retriever = MaintenanceRetriever(kb_dir="knowledge_base", index_file=os.path.join("vector_store", "kb_index.pkl"))
 generator = LLMReportGenerator(prompt_path=os.path.join("prompts", "report_prompt.txt"))
